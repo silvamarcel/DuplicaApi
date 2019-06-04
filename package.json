@@ -1,0 +1,53 @@
+{
+  "name": "duplica-api",
+  "version": "1.0.0",
+  "description": "Duplica API",
+  "main": "index.js",
+  "jest": {
+    "verbose": true,
+    "testEnvironment": "node",
+    "unmockedModulePathPatterns": [
+      "./node_modules/lodash",
+      "./node_modules/mongoose"
+    ]
+  },
+  "scripts": {
+    "lint": "eslint server/** tests/**",
+    "test": "jest --detectOpenHandles --forceExit --runInBand server",
+    "test:auto": "jest --detectOpenHandles --watch --runInBand --forceExit server",
+    "coverage": "jest --collectCoverageFrom=server/**.js --collectCoverageFrom=!server/utils/logger.js --coverage --runInBand --forceExit server",
+    "start": "node index.js",
+    "start:dev": "nodemon"
+  },
+  "author": "Marcel Silva",
+  "license": "MIT",
+  "dependencies": {
+    "bcrypt": "^3.0.6",
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "express-jwt": "^5.3.1",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.11",
+    "method-override": "^3.0.0",
+    "mongoose": "^5.5.12",
+    "morgan": "^1.9.1",
+    "winston": "^3.2.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.4.4",
+    "@babel/core": "^7.4.5",
+    "@babel/plugin-transform-runtime": "^7.4.4",
+    "@babel/polyfill": "^7.4.4",
+    "@babel/preset-env": "^7.4.5",
+    "@babel/runtime": "^7.4.5",
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.17.3",
+    "eslint-plugin-jest": "^22.6.4",
+    "jest": "^24.8.0",
+    "mockingoose": "^2.13.0",
+    "superagent": "^5.0.5",
+    "supertest": "^4.0.2"
+  }
+}
