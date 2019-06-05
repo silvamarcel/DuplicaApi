@@ -1,7 +1,7 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 const request = require('supertest');
 const app = require('../server');
-const userUtil = require('../../tests/utils/util.user.integration');
+const modelUtil = require('../../tests/utils/util.model.integration');
 const setup = require('../../tests/setup');
 
 describe('Authentication API', () => {
@@ -18,7 +18,7 @@ describe('Authentication API', () => {
       username: 'username_auth_001',
       password: 'pass',
     };
-    const createdUser = await userUtil.createUser(request(app), user);
+    const createdUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
     await request(app)
       .post('/auth/signin')
       .send(user)
@@ -39,7 +39,7 @@ describe('Authentication API', () => {
       username: 'username_auth_002',
       password: 'pass',
     };
-    await userUtil.createUser(request(app), user);
+    await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
     user.password = 'wrongPass';
     await request(app)
       .post('/auth/signin')
@@ -75,7 +75,7 @@ describe('Authentication API', () => {
       username: 'username_auth_004',
       password: 'pass',
     };
-    const createdUser = await userUtil.createUser(request(app), user);
+    const createdUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
     await request(app)
       .get('/api/users/me')
       .set('Accept', 'application/json')
@@ -95,8 +95,13 @@ describe('Authentication API', () => {
       username: 'username_auth_005',
       password: 'pass',
     };
-    const createdUser = await userUtil.createUser(request(app), user);
-    await userUtil.deleteUser(request(app), createdUser);
+    const createdUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
+    await modelUtil.delete(
+      request(app),
+      createdUser._id,
+      modelUtil.apiPaths.users,
+      createdUser.token,
+    );
     await request(app)
       .get(`/api/users/${createdUser._id}`)
       .set('Accept', 'application/json')

@@ -30,7 +30,7 @@ const me = async (req, res) => {
   await res.json(req.user);
 };
 
-const get = async (req, res, next) => {
+const list = async (req, res, next) => {
   await User.find({})
     .select('-password -__v')
     .exec()
@@ -42,7 +42,7 @@ const get = async (req, res, next) => {
     });
 };
 
-const getOne = async (req, res, next) => {
+const read = async (req, res, next) => {
   if (!req.user) {
     await next(appError.buildError(null, 404, 'User not found!'));
   } else {
@@ -67,14 +67,14 @@ const save = async (user, res, next) => {
     });
 };
 
-const put = async (req, res, next) => {
+const update = async (req, res, next) => {
   const { user } = req;
-  const update = req.body;
-  _.merge(user, update);
+  const updateUser = req.body;
+  _.merge(user, updateUser);
   await save(user, res, next);
 };
 
-const post = async (req, res, next) => {
+const create = async (req, res, next) => {
   await save(new User(req.body), res, next);
 };
 
@@ -91,9 +91,9 @@ const deleteUser = async (req, res, next) => {
 module.exports = {
   params,
   me,
-  get,
-  getOne,
-  put,
-  post,
+  list,
+  create,
+  read,
+  update,
   delete: deleteUser,
 };

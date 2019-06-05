@@ -1,12 +1,12 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id", "_doc"] }] */
 const mockingoose = require('mockingoose').default;
-const userController = require('./userController');
+const factoryController = require('./factoryController');
 
 let req = null;
 let res = null;
 let next = null;
 
-describe('User Controller API', () => {
+describe('Factory Controller API', () => {
   beforeEach(() => {
     mockingoose.resetAll();
     req = jest.fn();
@@ -17,7 +17,7 @@ describe('User Controller API', () => {
   it('Should return an error APIError with status 403 and Invalid id when an CastError occurs', async () => {
     const castError = new Error('Invalid id');
     castError.name = 'CastError';
-    mockingoose.users.toReturn(castError, 'findOne');
+    mockingoose.factories.toReturn(castError, 'findOne');
 
     next = (error) => {
       expect(error).toBeDefined();
@@ -27,63 +27,63 @@ describe('User Controller API', () => {
     };
     const id = 'myId';
 
-    await userController.params(req, res, next, id);
+    await factoryController.params(req, res, next, id);
   });
 
-  it('Should return an error when  an generic error occurs', async () => {
+  it('Should return an error when an generic error occurs', async () => {
     const genericError = new Error('Any error');
     genericError.name = 'Error';
-    mockingoose.users.toReturn(genericError, 'findOne');
+    mockingoose.factories.toReturn(genericError, 'findOne');
 
     next = (error) => {
       expect(error).toBeDefined();
       expect(error).toEqual(genericError);
     };
     const id = 'myId';
-    await userController.params(req, res, next, id);
+    await factoryController.params(req, res, next, id);
   });
 
   it('Should return the error when list throws an error', async () => {
     const error = new Error('Any error!');
-    mockingoose.users.toReturn(error, 'find');
-    await userController.list(req, res, next);
+    mockingoose.factories.toReturn(error, 'find');
+    await factoryController.list(req, res, next);
     expect(next).toHaveBeenCalledWith(error);
   });
 
-  it('Should return User not found when user is not defined', async () => {
-    req = { user: undefined };
+  it('Should return Factory not found when user is not defined', async () => {
+    req = { factory: undefined };
     res = { json: jest.fn() };
     next = (error) => {
       expect(error).toBeDefined();
       expect(error.name).toEqual('APIError');
       expect(error.status).toEqual(404);
-      expect(error.message).toEqual('User not found!');
+      expect(error.message).toEqual('Factory not found!');
     };
-    await userController.read(req, res, next);
+    await factoryController.read(req, res, next);
     expect(res.json).not.toHaveBeenCalled();
   });
 
-  it('Should return the error when User.delete throws an error', async () => {
+  it('Should return the error when delete throws an error', async () => {
     const error = new Error('Any error!');
     const remove = jest.fn(() => Promise.reject(error));
 
-    req = { user: { remove } };
+    req = { factory: { remove } };
     res = jest.fn();
     next = jest.fn();
-    await userController.delete(req, res, next);
+    await factoryController.delete(req, res, next);
     expect(next).toHaveBeenCalledWith(error);
   });
 
-  it('Should return an error when user.save throws an generic error', async () => {
+  it('Should return an error when create throws an generic error', async () => {
     const genericError = new Error('Any error!');
-    mockingoose.users.toReturn(genericError, 'save');
+    mockingoose.factories.toReturn(genericError, 'save');
     req = {
-      body: { username: 'myUsername', password: 'myPassword' },
+      body: { name: 'myFactory' },
     };
     next = (error) => {
       expect(error).toBeDefined();
       expect(error).toEqual(genericError);
     };
-    await userController.create(req, res, next);
+    await factoryController.create(req, res, next);
   });
 });

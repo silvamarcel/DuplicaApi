@@ -20,6 +20,7 @@
 * NodeJS
 * MongoDB
 * Docker (Optional)
+* Nodemon Globally (npm install -g nodemon)
 
 ## Install
 ```
