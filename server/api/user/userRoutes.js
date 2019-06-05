@@ -8,12 +8,12 @@ router.param('id', userController.params);
 router.get('/me', checkUser, userController.me);
 
 router.route('/')
-  .get(userController.get)
-  .post(userController.post);
+  .get(userController.list)
+  .post(userController.create);
 
 router.route('/:id')
-  .get(userController.getOne)
-  .put(checkUser, userController.put)
+  .get(userController.read)
+  .put(checkUser, userController.update)
   .delete(checkUser, userController.delete);
 
 module.exports = router;

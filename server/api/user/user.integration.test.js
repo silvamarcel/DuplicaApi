@@ -1,7 +1,7 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 const request = require('supertest');
 const app = require('../../server');
-const userUtil = require('../../../tests/utils/util.user.integration');
+const modelUtil = require('../../../tests/utils/util.model.integration');
 const setup = require('../../../tests/setup');
 
 describe('User API', () => {
@@ -18,7 +18,7 @@ describe('User API', () => {
       username: 'username_001',
       password: 'pass',
     };
-    const createdUser = await userUtil.createUser(request(app), user);
+    const createdUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
     expect(createdUser.username).toEqual(user.username);
     expect(createdUser.password).toBeUndefined();
     expect(createdUser.token).toBeDefined();
@@ -33,8 +33,8 @@ describe('User API', () => {
       username: 'username_003',
       password: 'pass',
     };
-    const createdUser = await userUtil.createUser(request(app), user);
-    const createdUser2 = await userUtil.createUser(request(app), user2);
+    const createdUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
+    const createdUser2 = await modelUtil.create(request(app), user2, modelUtil.apiPaths.users);
     await request(app)
       .get('/api/users')
       .set('Accept', 'application/json')
@@ -54,7 +54,7 @@ describe('User API', () => {
       username: 'username_004',
       password: 'pass',
     };
-    const createdUser = await userUtil.createUser(request(app), user);
+    const createdUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
     await request(app)
       .get(`/api/users/${createdUser._id}`)
       .set('Accept', 'application/json')
@@ -73,7 +73,7 @@ describe('User API', () => {
       username: 'username_005',
       password: 'pass',
     };
-    const createdUser = await userUtil.createUser(request(app), user);
+    const createdUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
     const updatedUsername = 'testUsername005updated';
     await request(app)
       .put(`/api/users/${createdUser._id}`)
@@ -95,7 +95,7 @@ describe('User API', () => {
       username: 'username_006',
       password: 'pass',
     };
-    const createdUser = await userUtil.createUser(request(app), user);
+    const createdUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
     await request(app)
       .get('/api/users/me')
       .set('Accept', 'application/json')
@@ -115,7 +115,7 @@ describe('User API', () => {
       username: 'username_007',
       password: 'pass',
     };
-    await userUtil.createUser(request(app), user);
+    await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
     await request(app)
       .post('/api/users')
       .send(user)
