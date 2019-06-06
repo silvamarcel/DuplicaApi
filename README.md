@@ -1,14 +1,15 @@
 # API Documentation
 
 ## API Status
-[![Build Status](https://semaphoreci.com/api/v1/silvamarcel/simplebitwalletserver/branches/master/badge.svg)](https://semaphoreci.com/silvamarcel/simplebitwalletserver)
+[![Build Status](https://semaphoreci.com/api/v1/projects/4e026b91-5c75-4da2-be18-6061995043c6/2033921/shields_badge.svg)](https://semaphoreci.com/silvamarcel/duplicaapi)
+[![codebeat badge](https://codebeat.co/badges/817412a1-3f69-4966-b916-8f07621a8b46)](https://codebeat.co/projects/github-com-silvamarcel-duplicaapi-master)
 
 ## Table of contents
 
 * [Dependencies](#dependencies)
 * [Install](#install)
 * [Run](#run)
-* [Test](#test)
+* [Test](#tests)
 * [Deploy](#deploy)
 * [Structure of the API](#structure-of-the-api)
 * [Deploying to prod](#deploying-to-prod)
@@ -72,7 +73,8 @@ It automatically deploys the code to Staging when it is committed in the Master 
     ├── LICENSE                 # MIT License file
     └── README.md               # This file
 
-## Deploying to prod 
-```
-Right now this happens manually in the Heroku pipeline. (https://dashboard.heroku.com/pipelines/03450c39-130b-4b97-97dc-8fc68ef3f800)
-```
+## Deploying to prod
+
+Right now this happens manually in the Heroku pipeline.~~~~~~~~~~~~~~~~
+
+* https://dashboard.heroku.com/pipelines/03450c39-130b-4b97-97dc-8fc68ef3f800
