@@ -16,7 +16,7 @@ const verifyJWTErrors = (err) => {
 };
 
 const verifyMongoDBErrors = (err) => {
-  if (error == null && err && err.name && err.name === 'MongoError') {
+  if (error === null && err && err.name && err.name === 'MongoError') {
     switch (err.code) {
       case 11000:
         setError(403, err.message);
@@ -30,7 +30,7 @@ const verifyMongoDBErrors = (err) => {
 };
 
 const verifyAPIErrors = (err) => {
-  if (error == null && err && err.name && err.name === 'APIError') {
+  if (error === null && err && err.name && err.name === 'APIError') {
     if (err.status) {
       setError(err.status, err.message);
     } else {

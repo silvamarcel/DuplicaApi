@@ -5,25 +5,22 @@ const User = require('./userModel');
 const appError = require('../../utils/error');
 const { signToken } = require('../../auth/auth');
 
+const goNext = (user, req, next) => {
+  req.user = user;
+  return next();
+};
+
 const params = async (req, res, next, id) => {
   await User.findById(id)
     .select('-password -__v')
     .exec()
     .then((user) => {
       if (!user) {
-        next(appError.buildError(null, 403, 'Invalid id'));
-      } else {
-        req.user = user;
-        next();
+        return next(appError.buildError(null, 403, 'Invalid id'));
       }
+      return goNext(user, req, next);
     })
-    .catch((err) => {
-      let error = err;
-      if (err.name === 'CastError') {
-        error = appError.buildError(err, 403, 'Invalid id');
-      }
-      next(error);
-    });
+    .catch(appError.catchError(next));
 };
 
 const me = async (req, res) => {
@@ -34,12 +31,8 @@ const list = async (req, res, next) => {
   await User.find({})
     .select('-password -__v')
     .exec()
-    .then((users) => {
-      res.json(users);
-    })
-    .catch((err) => {
-      next(err);
-    });
+    .then(users => res.json(users))
+    .catch(appError.catchError(next));
 };
 
 const read = async (req, res, next) => {
@@ -56,15 +49,9 @@ const save = async (user, res, next) => {
       const sUser = _.pick(savedUser, ['_id', 'username']);
       const token = signToken(sUser._id);
       const auth = { token };
-      res.json(_.assign(sUser, auth));
+      return res.json(_.assign(sUser, auth));
     })
-    .catch((err) => {
-      const error = err;
-      if (error && error.code === 11000) {
-        error.message = 'Username already exists.';
-      }
-      next(error);
-    });
+    .catch(appError.catchError(next, 'Username already exists.'));
 };
 
 const update = async (req, res, next) => {
@@ -80,12 +67,8 @@ const create = async (req, res, next) => {
 
 const deleteUser = async (req, res, next) => {
   await req.user.remove()
-    .then((removedUser) => {
-      res.json(removedUser);
-    })
-    .catch((err) => {
-      next(err);
-    });
+    .then(removedUser => res.json(removedUser))
+    .catch(appError.catchError(next));
 };
 
 module.exports = {
