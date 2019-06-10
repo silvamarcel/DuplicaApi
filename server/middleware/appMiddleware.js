@@ -7,17 +7,19 @@ const config = require('../config/config');
 
 const testing = () => config.env === 'testing';
 
+const addMorgan = (app) => {
+  app.use(morgan('combined', {
+    skip: (req, res) => res.statusCode < 400,
+    stream: process.stderr,
+  }));
+  app.use(morgan('combined', {
+    skip: (req, res) => res.statusCode >= 400,
+    stream: process.stdout,
+  }));
+};
+
 module.exports = (app) => {
-  if (!testing) {
-    app.use(morgan('combined', {
-      skip: (req, res) => res.statusCode < 400,
-      stream: process.stderr,
-    }));
-    app.use(morgan('combined', {
-      skip: (req, res) => res.statusCode >= 400,
-      stream: process.stdout,
-    }));
-  }
+  if (!testing) addMorgan(app);
   app.use(bodyParser.urlencoded({ extended: true }));
   app.use(bodyParser.json());
   app.use(cors());
