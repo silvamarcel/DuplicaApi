@@ -5,6 +5,11 @@ const Factory = require('./factoryModel');
 const appError = require('../../utils/error');
 const { signToken } = require('../../auth/auth');
 
+const goNext = (factory, req, next) => {
+  req.factory = factory;
+  return next();
+};
+
 const params = async (req, res, next, id) => {
   await Factory.findById(id)
     .select('-__v')
@@ -12,18 +17,11 @@ const params = async (req, res, next, id) => {
     .then((factory) => {
       if (!factory) {
         next(appError.buildError(null, 403, 'Invalid id'));
-      } else {
-        req.factory = factory;
-        next();
+        return null;
       }
+      return goNext(factory, req, next);
     })
-    .catch((err) => {
-      let error = err;
-      if (err.name === 'CastError') {
-        error = appError.buildError(err, 403, 'Invalid id');
-      }
-      next(error);
-    });
+    .catch(appError.catchError(next));
 };
 
 // TODO Improve ability to filter by name
@@ -31,12 +29,8 @@ const list = async (req, res, next) => {
   await Factory.find({})
     .select('-__v')
     .exec()
-    .then((factories) => {
-      res.json(factories);
-    })
-    .catch((err) => {
-      next(err);
-    });
+    .then(factories => res.json(factories))
+    .catch(appError.catchError(next));
 };
 
 const save = async (factory, user, res, next) => {
@@ -45,15 +39,9 @@ const save = async (factory, user, res, next) => {
       const sFactory = _.pick(savedFactory, ['_id', 'name']);
       const token = signToken(user._id);
       const auth = { token };
-      res.json(_.assign(sFactory, auth));
+      return res.json(_.assign(sFactory, auth));
     })
-    .catch((err) => {
-      const error = err;
-      if (error && error.code === 11000) {
-        error.message = 'A factory with this name already exists.';
-      }
-      next(error);
-    });
+    .catch(appError.catchError(next, 'A factory with this name already exists.'));
 };
 
 const create = async (req, res, next) => {
@@ -77,12 +65,8 @@ const update = async (req, res, next) => {
 
 const deleteFactory = async (req, res, next) => {
   await req.factory.remove()
-    .then((removedUser) => {
-      res.json(removedUser);
-    })
-    .catch((err) => {
-      next(err);
-    });
+    .then(removedFactory => res.json(removedFactory))
+    .catch(appError.catchError(next));
 };
 
 module.exports = {
