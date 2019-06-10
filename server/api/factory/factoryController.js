@@ -16,8 +16,7 @@ const params = async (req, res, next, id) => {
     .exec()
     .then((factory) => {
       if (!factory) {
-        next(appError.buildError(null, 403, 'Invalid id'));
-        return null;
+        return next(appError.buildError(null, 403, 'Invalid id'));
       }
       return goNext(factory, req, next);
     })
