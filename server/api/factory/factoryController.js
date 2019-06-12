@@ -1,5 +1,6 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 const _ = require('lodash');
+const { validationResult } = require('express-validator/check');
 
 const Factory = require('./factoryModel');
 const appError = require('../../utils/error');
@@ -44,6 +45,10 @@ const save = async (factory, user, res, next) => {
 };
 
 const create = async (req, res, next) => {
+  const errors = await validationResult(req);
+  if (!errors.isEmpty()) {
+    res.status(422).json({ errors: errors.array() });
+  }
   await save(new Factory(req.body), req.user, res, next);
 };
 
