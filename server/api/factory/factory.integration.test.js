@@ -36,18 +36,18 @@ describe('Factory API', () => {
     const createdFactory = await createFactory(factoryName);
     const createdFactory2 = await createFactory(factoryName2);
     await request(app)
-    .get('/api/factories')
-    .set('Authorization', `Bearer ${loggedUser.token}`)
-    .set('Accept', 'application/json')
-    .expect(200)
-    .then((response) => {
-      const factories = response.body;
-      expect(factories).toBeDefined();
-      expect(factories.length).toBeGreaterThanOrEqual(2);
-      expect(createdFactory.name).toEqual(factoryName);
-      expect(createdFactory2.name).toEqual(factoryName2);
-      done();
-    });
+      .get('/api/factories')
+      .set('Authorization', `Bearer ${loggedUser.token}`)
+      .set('Accept', 'application/json')
+      .expect(200)
+      .then((response) => {
+        const factories = response.body;
+        expect(factories).toBeDefined();
+        expect(factories.length).toBeGreaterThanOrEqual(2);
+        expect(createdFactory.name).toEqual(factoryName);
+        expect(createdFactory2.name).toEqual(factoryName2);
+        done();
+      });
   });
 
   it('Should create a factory', async () => {
@@ -129,6 +129,28 @@ describe('Factory API', () => {
         expect(response.error).toBeDefined();
         expect(response.text).toBeDefined();
         expect(response.text).toEqual('A factory with this name already exists.');
+        done();
+      });
+  });
+
+  it('Should throw name is required error when try to create a factory without name', async (done) => {
+    const factoryName = '';
+    await request(app)
+      .post('/api/factories')
+      .send({
+        name: factoryName,
+      })
+      .set('Authorization', `Bearer ${loggedUser.token}`)
+      .set('Accept', 'application/json')
+      .expect(422)
+      .then((response) => {
+        expect(response.body).toBeDefined();
+        expect(response.body.errors).toBeDefined();
+        expect(response.body.errors).toHaveLength(1);
+        expect(response.body.errors[0].location).toEqual('body');
+        expect(response.body.errors[0].param).toEqual('name');
+        expect(response.body.errors[0].value).toEqual('');
+        expect(response.body.errors[0].msg).toEqual('Factory name is required');
         done();
       });
   });
