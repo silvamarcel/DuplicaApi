@@ -79,7 +79,6 @@ describe('Factory Controller API', () => {
     mockingoose.factories.toReturn(genericError, 'save');
     req = {
       body: { name: 'myFactory' },
-      getValidationResult: () => ({ isEmpty: () => true }),
     };
     next = (error) => {
       expect(error).toBeDefined();
