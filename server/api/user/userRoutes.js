@@ -3,17 +3,18 @@ const userController = require('./userController');
 const auth = require('../../auth/auth');
 
 const checkUser = [auth.decodeToken(), auth.getFreshUser()];
+const validateAuth = [auth.decodeToken()];
 
 router.param('id', userController.params);
 router.get('/me', checkUser, userController.me);
 
 router.route('/')
-  .get(userController.list)
-  .post(userController.create);
+  .get(validateAuth, userController.list)
+  .post(validateAuth, userController.create);
 
 router.route('/:id')
-  .get(userController.read)
-  .put(checkUser, userController.update)
-  .delete(checkUser, userController.delete);
+  .get(validateAuth, userController.read)
+  .put(validateAuth, userController.update)
+  .delete(validateAuth, userController.delete);
 
 module.exports = router;

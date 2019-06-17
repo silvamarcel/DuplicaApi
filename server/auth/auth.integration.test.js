@@ -18,7 +18,11 @@ describe('Authentication API', () => {
       username: 'username_auth_001',
       password: 'pass',
     };
-    const createdUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
+    const createdUser = await modelUtil.create(
+      request(app),
+      user,
+      modelUtil.apiPaths.users,
+    );
     await request(app)
       .post('/auth/signin')
       .send(user)
@@ -39,7 +43,11 @@ describe('Authentication API', () => {
       username: 'username_auth_002',
       password: 'pass',
     };
-    await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
+    await modelUtil.create(
+      request(app),
+      user,
+      modelUtil.apiPaths.users,
+    );
     user.password = 'wrongPass';
     await request(app)
       .post('/auth/signin')
@@ -75,7 +83,11 @@ describe('Authentication API', () => {
       username: 'username_auth_004',
       password: 'pass',
     };
-    const createdUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
+    const createdUser = await modelUtil.create(
+      request(app),
+      user,
+      modelUtil.apiPaths.users,
+    );
     await request(app)
       .get('/api/users/me')
       .set('Accept', 'application/json')
@@ -95,7 +107,11 @@ describe('Authentication API', () => {
       username: 'username_auth_005',
       password: 'pass',
     };
-    const createdUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
+    const createdUser = await modelUtil.create(
+      request(app),
+      user,
+      modelUtil.apiPaths.users,
+    );
     await modelUtil.delete(
       request(app),
       createdUser._id,

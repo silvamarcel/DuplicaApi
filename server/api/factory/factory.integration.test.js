@@ -6,13 +6,10 @@ const setup = require('../../../tests/setup');
 
 let loggedUser = null;
 
-const createFactory = name => modelUtil.createWithToken(
+const createFactory = name => modelUtil.create(
   request(app),
-  {
-    name,
-  },
+  { name },
   modelUtil.apiPaths.factories,
-  loggedUser.token,
 );
 
 const user = {
@@ -23,7 +20,11 @@ const user = {
 describe('Factory API', () => {
   beforeAll(async () => {
     await setup.init();
-    loggedUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
+    loggedUser = await modelUtil.create(
+      request(app),
+      user,
+      modelUtil.apiPaths.users,
+    );
   });
 
   afterAll((done) => {
