@@ -3,6 +3,7 @@ const _ = require('lodash');
 
 const User = require('./userModel');
 const appError = require('../../utils/error');
+const appValidation = require('../../utils/validation');
 const { signToken } = require('../../auth/auth');
 
 const goNext = (user, req, next) => {
@@ -58,6 +59,7 @@ const save = async (user, res, next) => {
 };
 
 const update = async (req, res, next) => {
+  appValidation.validateRequest(req, res);
   const { userModel } = req;
   const updateUser = req.body;
   _.merge(userModel, updateUser);
@@ -65,6 +67,7 @@ const update = async (req, res, next) => {
 };
 
 const create = async (req, res, next) => {
+  appValidation.validateRequest(req, res);
   await save(new User(req.body), res, next);
 };
 

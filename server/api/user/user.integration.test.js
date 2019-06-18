@@ -140,4 +140,27 @@ describe('User API', () => {
         done();
       });
   });
+
+  it('Should throw Username is required error when try to create an user without username', async (done) => {
+    const username = '';
+    await request(app)
+      .post('/api/users')
+      .send({
+        username,
+        password: '12345',
+      })
+      .set('Authorization', `Bearer ${admin.token}`)
+      .set('Accept', 'application/json')
+      .expect(422)
+      .then((response) => {
+        expect(response.body).toBeDefined();
+        expect(response.body.errors).toBeDefined();
+        expect(response.body.errors).toHaveLength(1);
+        expect(response.body.errors[0].location).toEqual('body');
+        expect(response.body.errors[0].param).toEqual('username');
+        expect(response.body.errors[0].value).toEqual('');
+        expect(response.body.errors[0].msg).toEqual('Username is required');
+        done();
+      });
+  });
 });

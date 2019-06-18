@@ -1,9 +1,9 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 const _ = require('lodash');
-const { validationResult } = require('express-validator/check');
 
 const Factory = require('./factoryModel');
 const appError = require('../../utils/error');
+const appValidation = require('../../utils/validation');
 const { signToken } = require('../../auth/auth');
 
 const goNext = (factory, req, next) => {
@@ -45,10 +45,7 @@ const save = async (factory, user, res, next) => {
 };
 
 const create = async (req, res, next) => {
-  const errors = await validationResult(req);
-  if (!errors.isEmpty()) {
-    res.status(422).json({ errors: errors.array() });
-  }
+  appValidation.validateRequest(req, res);
   await save(new Factory(req.body), req.user, res, next);
 };
 
@@ -61,6 +58,7 @@ const read = async (req, res, next) => {
 };
 
 const update = async (req, res, next) => {
+  appValidation.validateRequest(req, res);
   const { factory, user } = req;
   const updatedFactory = req.body;
   _.merge(factory, updatedFactory);

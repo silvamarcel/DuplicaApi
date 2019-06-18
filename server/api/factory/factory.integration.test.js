@@ -155,4 +155,25 @@ describe('Factory API', () => {
         done();
       });
   });
+
+  it('Should throw name is required error when try to update a factory without name', async (done) => {
+    const factoryName = 'factory_007';
+    const createdFactory = await createFactory(factoryName);
+    await request(app)
+      .put(`/api/factories/${createdFactory._id}`)
+      .send({ name: '' })
+      .set('Accept', 'application/json')
+      .set('Authorization', `Bearer ${loggedUser.token}`)
+      .expect(422)
+      .then((response) => {
+        expect(response.body).toBeDefined();
+        expect(response.body.errors).toBeDefined();
+        expect(response.body.errors).toHaveLength(1);
+        expect(response.body.errors[0].location).toEqual('body');
+        expect(response.body.errors[0].param).toEqual('name');
+        expect(response.body.errors[0].value).toEqual('');
+        expect(response.body.errors[0].msg).toEqual('Factory name is required');
+        done();
+      });
+  });
 });

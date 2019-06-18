@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const userController = require('./userController');
+const userValidator = require('./userValidator');
 const auth = require('../../auth/auth');
 
 const checkUser = [auth.decodeToken(), auth.getFreshUser()];
@@ -10,7 +11,9 @@ router.get('/me', checkUser, userController.me);
 
 router.route('/')
   .get(validateAuth, userController.list)
-  .post(validateAuth, userController.create);
+  .post(validateAuth,
+    userValidator.validateCreateOrUpdate,
+    userController.create);
 
 router.route('/:id')
   .get(validateAuth, userController.read)

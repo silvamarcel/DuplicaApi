@@ -1,4 +1,5 @@
 const APIErrorName = 'APIError';
+
 const buildError = (err, status, message) => {
   let error = err;
   if (!error) {
