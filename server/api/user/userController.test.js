@@ -51,7 +51,7 @@ describe('User Controller API', () => {
   });
 
   it('Should return User not found when user is not defined', async () => {
-    req = { user: undefined };
+    req = { userModel: undefined };
     res = { json: jest.fn() };
     next = (error) => {
       expect(error).toBeDefined();
@@ -67,7 +67,7 @@ describe('User Controller API', () => {
     const error = new Error('Any error!');
     const remove = jest.fn(() => Promise.reject(error));
 
-    req = { user: { remove } };
+    req = { userModel: { remove } };
     res = jest.fn();
     next = jest.fn();
     await userController.delete(req, res, next);

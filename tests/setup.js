@@ -1,6 +1,7 @@
 const config = require('../server/config/config');
 const logger = require('../server/utils/logger');
 const dbTest = require('../server/utils/db');
+const userController = require('../server/api/user/userController');
 
 const initConfig = () => {
   logger.info('Initializing config files for test...');
@@ -25,6 +26,15 @@ const initModels = async () => {
   logger.info('Models for test initialized.');
 };
 
+const createUserManager = async () => {
+  logger.info('Creating user manager...');
+  await userController.createManagerUser({
+    username: config.userManager,
+    password: config.passManager,
+  });
+  logger.info('User manager created.');
+};
+
 const startDB = async () => {
   logger.info('Starting the DB connection...');
   await dbTest.connect();
@@ -42,6 +52,7 @@ const init = async () => {
   await startDB();
   await cleanDB();
   await initModels();
+  await createUserManager();
 };
 
 const close = async (done) => {

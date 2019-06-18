@@ -15,7 +15,7 @@
     "lint": "eslint server/** tests/**",
     "test": "jest --detectOpenHandles --forceExit --runInBand server",
     "test:auto": "jest --detectOpenHandles --watch --runInBand --forceExit server",
-    "coverage": "jest --collectCoverageFrom=server/**.js --collectCoverageFrom=!server/utils/logger.js --coverage --runInBand --forceExit server",
+    "coverage": "jest --collectCoverageFrom=server/**/*.js --collectCoverageFrom=!server/utils/logger.js --collectCoverageFrom=!server/middleware/appMiddleware.js --coverage --runInBand --forceExit server",
     "start": "node index.js",
     "start:dev": "nodemon"
   },
@@ -31,7 +31,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.11",
     "method-override": "^3.0.0",
-    "mongoose": "^5.5.12",
+    "mongoose": "^5.6.0",
     "morgan": "^1.9.1",
     "winston": "^3.2.1"
   },

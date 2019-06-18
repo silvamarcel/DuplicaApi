@@ -4,9 +4,18 @@ const app = require('../../server');
 const modelUtil = require('../../../tests/utils/util.model.integration');
 const setup = require('../../../tests/setup');
 
+let admin;
+
+const createUser = user => modelUtil.create(
+  request(app),
+  user,
+  modelUtil.apiPaths.users,
+);
+
 describe('User API', () => {
   beforeAll(async () => {
     await setup.init();
+    admin = await modelUtil.getAdminUser(request(app));
   });
 
   afterAll((done) => {
@@ -18,7 +27,7 @@ describe('User API', () => {
       username: 'username_001',
       password: 'pass',
     };
-    const createdUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
+    const createdUser = await createUser(user);
     expect(createdUser.username).toEqual(user.username);
     expect(createdUser.password).toBeUndefined();
     expect(createdUser.token).toBeDefined();
@@ -33,11 +42,12 @@ describe('User API', () => {
       username: 'username_003',
       password: 'pass',
     };
-    const createdUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
-    const createdUser2 = await modelUtil.create(request(app), user2, modelUtil.apiPaths.users);
+    const createdUser = await createUser(user);
+    const createdUser2 = await createUser(user2);
     await request(app)
       .get('/api/users')
       .set('Accept', 'application/json')
+      .set('Authorization', `Bearer ${admin.token}`)
       .expect(200)
       .then((response) => {
         const users = response.body;
@@ -54,10 +64,11 @@ describe('User API', () => {
       username: 'username_004',
       password: 'pass',
     };
-    const createdUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
+    const createdUser = await createUser(user);
     await request(app)
       .get(`/api/users/${createdUser._id}`)
       .set('Accept', 'application/json')
+      .set('Authorization', `Bearer ${createdUser.token}`)
       .expect(200)
       .then((response) => {
         const foundUser = response.body;
@@ -73,7 +84,7 @@ describe('User API', () => {
       username: 'username_005',
       password: 'pass',
     };
-    const createdUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
+    const createdUser = await createUser(user);
     const updatedUsername = 'testUsername005updated';
     await request(app)
       .put(`/api/users/${createdUser._id}`)
@@ -95,7 +106,7 @@ describe('User API', () => {
       username: 'username_006',
       password: 'pass',
     };
-    const createdUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
+    const createdUser = await createUser(user);
     await request(app)
       .get('/api/users/me')
       .set('Accept', 'application/json')
@@ -115,16 +126,40 @@ describe('User API', () => {
       username: 'username_007',
       password: 'pass',
     };
-    await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
+    await createUser(user);
     await request(app)
       .post('/api/users')
       .send(user)
       .set('Accept', 'application/json')
+      .set('Authorization', `Bearer ${admin.token}`)
       .expect(403)
       .then((response) => {
         expect(response.error).toBeDefined();
         expect(response.text).toBeDefined();
         expect(response.text).toEqual('Username already exists.');
+        done();
+      });
+  });
+
+  it('Should throw Username is required error when try to create an user without username', async (done) => {
+    const username = '';
+    await request(app)
+      .post('/api/users')
+      .send({
+        username,
+        password: '12345',
+      })
+      .set('Authorization', `Bearer ${admin.token}`)
+      .set('Accept', 'application/json')
+      .expect(422)
+      .then((response) => {
+        expect(response.body).toBeDefined();
+        expect(response.body.errors).toBeDefined();
+        expect(response.body.errors).toHaveLength(1);
+        expect(response.body.errors[0].location).toEqual('body');
+        expect(response.body.errors[0].param).toEqual('username');
+        expect(response.body.errors[0].value).toEqual('');
+        expect(response.body.errors[0].msg).toEqual('Username is required');
         done();
       });
   });

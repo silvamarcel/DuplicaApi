@@ -6,13 +6,10 @@ const setup = require('../../../tests/setup');
 
 let loggedUser = null;
 
-const createFactory = name => modelUtil.createWithToken(
+const createFactory = name => modelUtil.create(
   request(app),
-  {
-    name,
-  },
+  { name },
   modelUtil.apiPaths.factories,
-  loggedUser.token,
 );
 
 const user = {
@@ -23,7 +20,11 @@ const user = {
 describe('Factory API', () => {
   beforeAll(async () => {
     await setup.init();
-    loggedUser = await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
+    loggedUser = await modelUtil.create(
+      request(app),
+      user,
+      modelUtil.apiPaths.users,
+    );
   });
 
   afterAll((done) => {
@@ -142,6 +143,27 @@ describe('Factory API', () => {
       })
       .set('Authorization', `Bearer ${loggedUser.token}`)
       .set('Accept', 'application/json')
+      .expect(422)
+      .then((response) => {
+        expect(response.body).toBeDefined();
+        expect(response.body.errors).toBeDefined();
+        expect(response.body.errors).toHaveLength(1);
+        expect(response.body.errors[0].location).toEqual('body');
+        expect(response.body.errors[0].param).toEqual('name');
+        expect(response.body.errors[0].value).toEqual('');
+        expect(response.body.errors[0].msg).toEqual('Factory name is required');
+        done();
+      });
+  });
+
+  it('Should throw name is required error when try to update a factory without name', async (done) => {
+    const factoryName = 'factory_007';
+    const createdFactory = await createFactory(factoryName);
+    await request(app)
+      .put(`/api/factories/${createdFactory._id}`)
+      .send({ name: '' })
+      .set('Accept', 'application/json')
+      .set('Authorization', `Bearer ${loggedUser.token}`)
       .expect(422)
       .then((response) => {
         expect(response.body).toBeDefined();

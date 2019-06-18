@@ -31,7 +31,7 @@ const addValidators = (app) => {
 const addRequestsMiddlewares = (app) => {
   app.use(cors());
   app.use(override());
-}
+};
 
 module.exports = (app) => {
   if (!testing) addMorgan(app);

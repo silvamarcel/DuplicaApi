@@ -3,21 +3,21 @@ const factoryController = require('./factoryController');
 const factoryValidator = require('./factoryValidator');
 const auth = require('../../auth/auth');
 
-const checkUser = [auth.decodeToken(), auth.getFreshUser()];
+const validateAuth = [auth.decodeToken()];
 
 router.param('id', factoryController.params);
 
 router.route('/')
-  .get(checkUser, factoryController.list)
-  .post(checkUser,
+  .get(validateAuth, factoryController.list)
+  .post(validateAuth,
     factoryValidator.validateCreateOrUpdate,
     factoryController.create);
 
 router.route('/:id')
-  .get(checkUser, factoryController.read)
-  .put(checkUser,
-    factoryController.update,
-    factoryValidator.validateCreateOrUpdate)
-  .delete(checkUser, factoryController.delete);
+  .get(validateAuth, factoryController.read)
+  .put(validateAuth,
+    factoryValidator.validateCreateOrUpdate,
+    factoryController.update)
+  .delete(validateAuth, factoryController.delete);
 
 module.exports = router;

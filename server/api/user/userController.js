@@ -3,10 +3,12 @@ const _ = require('lodash');
 
 const User = require('./userModel');
 const appError = require('../../utils/error');
+const appValidation = require('../../utils/validation');
 const { signToken } = require('../../auth/auth');
 
 const goNext = (user, req, next) => {
-  req.user = user;
+  req.userModel = user;
+  req.leanUser = user.toObject();
   return next();
 };
 
@@ -36,37 +38,46 @@ const list = async (req, res, next) => {
 };
 
 const read = async (req, res, next) => {
-  if (!req.user) {
+  if (!req.leanUser) {
     await next(appError.buildError(null, 404, 'User not found!'));
   } else {
-    await res.json(req.user);
+    await res.json(req.leanUser);
   }
+};
+
+const buildSavedUser = (savedUser) => {
+  const adminUser = _.pick(savedUser, ['_id', 'username']);
+  const token = signToken(adminUser._id);
+  const auth = { token };
+  return _.assign(adminUser, auth);
 };
 
 const save = async (user, res, next) => {
   await user.save()
-    .then((savedUser) => {
-      const sUser = _.pick(savedUser, ['_id', 'username']);
-      const token = signToken(sUser._id);
-      const auth = { token };
-      return res.json(_.assign(sUser, auth));
-    })
+    .then(savedUser => res.json(buildSavedUser(savedUser)))
     .catch(appError.catchError(next, 'Username already exists.'));
 };
 
 const update = async (req, res, next) => {
-  const { user } = req;
+  appValidation.validateRequest(req, res);
+  const { userModel } = req;
   const updateUser = req.body;
-  _.merge(user, updateUser);
-  await save(user, res, next);
+  _.merge(userModel, updateUser);
+  await save(userModel, res, next);
 };
 
 const create = async (req, res, next) => {
+  appValidation.validateRequest(req, res);
   await save(new User(req.body), res, next);
 };
 
+const createManagerUser = async (data) => {
+  await (new User(data)).save()
+    .then(savedUser => buildSavedUser(savedUser));
+};
+
 const deleteUser = async (req, res, next) => {
-  await req.user.remove()
+  await req.userModel.remove()
     .then(removedUser => res.json(removedUser))
     .catch(appError.catchError(next));
 };
@@ -76,6 +87,7 @@ module.exports = {
   me,
   list,
   create,
+  createManagerUser,
   read,
   update,
   delete: deleteUser,
