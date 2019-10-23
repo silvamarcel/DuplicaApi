@@ -1,7 +1,8 @@
 const config = require('./server/config/config'); // Needs to be the first to load all configurations before everything.
-const app = require('./server/server');
-const logger = require('./server/utils/logger');
-const db = require('./server/utils/db');
+const db = require('./server/store/database')({ config });
+const logger = require('./server/logger/logger')({ config });
+const middleware = require('./server/middleware')({ config, logger });
+const app = require('./server/server')({ config, logger, middleware });
 
 // Start the connection with the DB
 db.connect();

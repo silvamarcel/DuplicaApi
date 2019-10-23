@@ -1,4 +1,7 @@
-const eh = require('./errorHandlingMiddleware');
+const { initConfig } = require('../../tests/setup');
+
+const logger = require('../logger/logger')({ config: initConfig() });
+const errorHandlingMiddleware = require('./errorHandlingMiddleware')({ logger });
 const response = require('../../tests/utils/response.mock');
 
 let values;
@@ -19,7 +22,7 @@ describe('errorHandling.js', () => {
 
   it('Should return 401 UnauthorizedError', () => {
     error = { name: 'UnauthorizedError' };
-    eh(error, null, res, next);
+    errorHandlingMiddleware(error, null, res, next);
     expect(values.status).toEqual(401);
     expect(values.message).toEqual('Invalid token');
   });
@@ -30,7 +33,7 @@ describe('errorHandling.js', () => {
       name: 'MongoError',
       message: 'Any message',
     };
-    eh(error, null, res, next);
+    errorHandlingMiddleware(error, null, res, next);
     expect(values.status).toEqual(403);
     expect(values.message).toEqual('Any message');
   });
@@ -41,7 +44,7 @@ describe('errorHandling.js', () => {
       name: 'MongoError',
       message: 'Any message',
     };
-    eh(error, null, res, next);
+    errorHandlingMiddleware(error, null, res, next);
     expect(values.status).toEqual(500);
     expect(values.message).toEqual('Unknown error or not mapped: Any message');
   });
@@ -52,7 +55,7 @@ describe('errorHandling.js', () => {
       name: 'APIError',
       message: 'Any message',
     };
-    eh(error, null, res, next);
+    errorHandlingMiddleware(error, null, res, next);
     expect(values.status).toEqual(402);
     expect(values.message).toEqual('Any message');
   });
@@ -62,14 +65,14 @@ describe('errorHandling.js', () => {
       name: 'APIError',
       message: 'Any message',
     };
-    eh(error, null, res, next);
+    errorHandlingMiddleware(error, null, res, next);
     expect(values.status).toEqual(500);
     expect(values.message).toEqual('Any message');
   });
 
   it('Should not return an Error when err is null', () => {
     error = null;
-    eh(error, null, res, next);
+    errorHandlingMiddleware(error, null, res, next);
     expect(next).toHaveBeenCalled();
   });
 });

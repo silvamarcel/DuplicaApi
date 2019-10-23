@@ -1,53 +1,50 @@
-const logger = require('../utils/logger');
+const has = error => error && error.name;
+const is = (error, name) => has(error) && error.name === name;
 
-let error = null;
-
-const setError = (status, message) => {
-  error = {
+const buildError = (logger, status, message) => {
+  logger.error(`${status} | ${message}`);
+  return {
     status,
     message,
   };
 };
 
-const verifyJWTErrors = (err) => {
-  if (err && err.name === 'UnauthorizedError') {
-    setError(401, 'Invalid token');
+const verifyJWTErrors = ({ logger, err }) => {
+  if (is(err, 'UnauthorizedError')) {
+    throw buildError(logger, 401, 'Invalid token');
   }
 };
 
-const verifyMongoDBErrors = (err) => {
-  if (error === null && err && err.name && err.name === 'MongoError') {
+const verifyMongoDBErrors = ({ logger, err }) => {
+  if (is(err, 'MongoError')) {
     switch (err.code) {
       case 11000:
-        setError(403, err.message);
-        break;
+        throw buildError(logger, 403, err.message);
       default:
-        setError(500, `Unknown error or not mapped: ${err.message}`);
-        break;
+        throw buildError(logger, 500, `Unknown error or not mapped: ${err.message}`);
     }
-    logger.error(err);
   }
 };
 
-const verifyAPIErrors = (err) => {
-  if (error === null && err && err.name && err.name === 'APIError') {
+const verifyAPIErrors = ({ logger, err }) => {
+  if (is(err, 'APIError')) {
     if (err.status) {
-      setError(err.status, err.message);
+      throw buildError(logger, err.status, err.message);
     } else {
-      setError(500, err.message);
+      throw buildError(logger, 500, err.message);
     }
-    logger.error(err);
   }
 };
 
-module.exports = (err, req, res, next) => {
-  error = null;
-  verifyJWTErrors(err);
-  verifyMongoDBErrors(err);
-  verifyAPIErrors(err);
-  if (error) {
-    res.status(error.status).send(error.message);
-  } else {
+const errorHandlingMiddleware = ({ logger }) => (err, req, res, next) => {
+  try {
+    verifyJWTErrors({ logger, err });
+    verifyMongoDBErrors({ logger, err });
+    verifyAPIErrors({ logger, err });
     next();
+  } catch (error) {
+    res.status(error.status).send(error.message);
   }
 };
+
+module.exports = errorHandlingMiddleware;

@@ -1,8 +1,12 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 const request = require('supertest');
-const app = require('../../server');
-const modelUtil = require('../../../tests/utils/util.model.integration');
 const setup = require('../../../tests/setup');
+
+const config = setup.initConfig();
+const logger = require('../../logger/logger')({ config });
+const middleware = require('../../middleware')({ config, logger });
+const app = require('../../server')({ config, logger, middleware });
+const modelUtil = require('../../../tests/utils/util.model.integration');
 
 let loggedUser = null;
 

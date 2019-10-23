@@ -4,9 +4,7 @@ const cors = require('cors');
 const override = require('method-override');
 const expressValidator = require('express-validator');
 
-const config = require('../config/config');
-
-const testing = () => config.env === 'testing';
+const testing = config => config.env === 'testing';
 
 const addMorgan = (app) => {
   app.use(morgan('combined', {
@@ -33,8 +31,8 @@ const addRequestsMiddlewares = (app) => {
   app.use(override());
 };
 
-module.exports = (app) => {
-  if (!testing) addMorgan(app);
+module.exports = ({ config }) => (app) => {
+  if (!testing(config)) addMorgan(app);
   addBodyParser(app);
   addValidators(app);
   addRequestsMiddlewares(app);
