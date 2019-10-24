@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const connect = ({ config }) => mongoose.connect(config.db.url, {
+const connect = ({ config }) => () => mongoose.connect(config.db.url, {
   useNewUrlParser: true,
   useFindAndModify: false,
   useCreateIndex: true,
