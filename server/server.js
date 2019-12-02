@@ -3,7 +3,7 @@ const express = require('express');
 const api = require('./api');
 const auth = require('./auth/authRoutes');
 
-const server = ({ config, logger, middleware }) => {
+const server = ({ middleware }) => {
   const app = express();
 
   // Setup the app middleware's
