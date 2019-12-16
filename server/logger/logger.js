@@ -1,7 +1,6 @@
 const winston = require('winston');
-const config = require('../config/config');
 
-const logger = winston.createLogger({
+const logger = ({ config }) => winston.createLogger({
   silent: config.env === 'testing',
   transports: [
     new winston.transports.Console({

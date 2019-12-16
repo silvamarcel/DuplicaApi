@@ -1,6 +1,6 @@
 const config = require('../server/config/config');
-const logger = require('../server/utils/logger');
-const dbTest = require('../server/utils/db');
+const logger = require('../server/logger/logger')({ config });
+const dbTest = require('../server/store/database')({ config });
 const userController = require('../server/api/user/userController');
 
 const initConfig = () => {
@@ -10,6 +10,7 @@ const initConfig = () => {
   dbTest.mongoose.set('bufferCommands', false);
   // dbTest.mongoose.set('debug', config.mongooseDebug);
   logger.info('Config files for test initialized.');
+  return config;
 };
 
 const initModels = async () => {
@@ -64,5 +65,6 @@ const close = async (done) => {
 
 module.exports = {
   init,
+  initConfig,
   close,
 };

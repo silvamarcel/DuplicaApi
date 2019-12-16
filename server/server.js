@@ -2,20 +2,22 @@ const express = require('express');
 
 const api = require('./api');
 const auth = require('./auth/authRoutes');
-const appMiddleware = require('./middleware/appMiddleware');
-const errorHandling = require('./middleware/errorHandlingMiddleware');
 
-const app = express();
+const server = ({ middleware }) => {
+  const app = express();
 
-// Setup the app middleware's
-appMiddleware(app);
+  // Setup the app middleware's
+  middleware.appMiddleware(app);
 
-// Setup the api routes
-app.use('/api/', api);
-app.use('/auth/', auth);
+  // Setup the api routes
+  app.use('/api/', api);
+  app.use('/auth/', auth);
 
-// Setup the global error handling
-app.use(errorHandling);
+  // Setup the global error handling
+  app.use(middleware.errorHandlingMiddleware);
+  return app;
+};
+
 
 // Exports the app for tests
-module.exports = app;
+module.exports = server;
