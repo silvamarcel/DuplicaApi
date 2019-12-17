@@ -1,7 +1,7 @@
 const express = require('express');
 
 const api = require('./api');
-const auth = require('./auth/authRoutes');
+const auth = require('./auth');
 
 const server = ({ middleware }) => {
   const app = express();
