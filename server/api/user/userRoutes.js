@@ -2,9 +2,18 @@ const router = require('express').Router();
 const userController = require('./userController');
 const userValidator = require('./userValidator');
 
-const userRoutes = ({ auth }) => {
+const buildCheckersAndValidators = ({ auth }) => {
   const checkUser = [auth.decodeToken(), auth.getFreshUser()];
   const validateAuth = [auth.decodeToken()];
+
+  return {
+    checkUser,
+    validateAuth,
+  };
+};
+
+const userRoutes = ({ auth }) => {
+  const { checkUser, validateAuth } = buildCheckersAndValidators({ auth });
 
   router.param('id', userController.params);
   router.get('/me', checkUser, userController.me);
