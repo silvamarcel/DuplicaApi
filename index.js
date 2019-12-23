@@ -7,7 +7,7 @@ const App = require('./server/server');
 const database = Database({ config });
 const logger = Logger({ config });
 const middleware = Middleware({ config, logger });
-const app = App({ config, logger, middleware });
+const app = App({ middleware });
 
 // Start the connection with the DB
 database.connect();
