@@ -37,7 +37,7 @@ const save = async (factory, user, res, next) => {
   await factory.save()
     .then((savedFactory) => {
       const sFactory = _.pick(savedFactory, ['_id', 'name']);
-      const token = signToken(user._id);
+      const token = signToken(user);
       const auth = { token };
       return res.json(_.assign(sFactory, auth));
     })

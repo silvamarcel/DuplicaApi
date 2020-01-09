@@ -1,0 +1,42 @@
+[
+  {
+    "group": "admin",
+    "permissions": [
+      {
+        "resource": "*",
+        "methods": "*",
+        "action": "allow"
+      }
+    ]
+  },
+  {
+    "group": "guest",
+    "permissions": [
+      {
+        "resource": "*",
+        "methods": "*",
+        "action": "deny"
+      }
+    ]
+  },
+  {
+    "group": "user",
+    "permissions": [
+      {
+        "resource": "users/*",
+        "methods": ["POST", "GET", "PUT", "DELETE"],
+        "action": "deny",
+        "subRoutes": [{
+          "resource": "me",
+          "methods": ["GET"],
+          "action": "allow"
+        }]
+      },
+      {
+        "resource": "factories/*",
+        "methods": ["POST", "GET", "PUT", "DELETE"],
+        "action": "allow"
+      }
+    ]
+  }
+]

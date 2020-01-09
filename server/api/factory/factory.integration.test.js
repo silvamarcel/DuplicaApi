@@ -19,6 +19,7 @@ const createFactory = name => modelUtil.create(
 const user = {
   username: 'userForFactoryIntegrationTest',
   password: 'pass',
+  role: 'user',
 };
 
 describe('Factory API', () => {

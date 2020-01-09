@@ -21,6 +21,7 @@ describe('Authentication API', () => {
     const user = {
       username: 'username_auth_001',
       password: 'pass',
+      role: 'user',
     };
     const createdUser = await modelUtil.create(
       request(app),
@@ -37,6 +38,7 @@ describe('Authentication API', () => {
         expect(loggedUser).toBeDefined();
         expect(loggedUser._id).toEqual(createdUser._id);
         expect(loggedUser.username).toEqual(createdUser.username);
+        expect(loggedUser.role).toEqual(createdUser.role);
         expect(loggedUser.token).toBeDefined();
         done();
       });
@@ -46,6 +48,7 @@ describe('Authentication API', () => {
     const user = {
       username: 'username_auth_002',
       password: 'pass',
+      role: 'user',
     };
     await modelUtil.create(
       request(app),
@@ -65,10 +68,11 @@ describe('Authentication API', () => {
       });
   });
 
-  it('Should not signin and receive you need an username and password', async (done) => {
+  it('Should receive the error message \'you need an username and password\'', async (done) => {
     const user = {
       username: 'username_auth_003',
       password: null,
+      role: 'user',
     };
     await request(app)
       .post('/auth/signin')
@@ -86,6 +90,7 @@ describe('Authentication API', () => {
     const user = {
       username: 'username_auth_004',
       password: 'pass',
+      role: 'admin',
     };
     const createdUser = await modelUtil.create(
       request(app),
@@ -110,6 +115,7 @@ describe('Authentication API', () => {
     const user = {
       username: 'username_auth_005',
       password: 'pass',
+      role: 'admin',
     };
     const createdUser = await modelUtil.create(
       request(app),

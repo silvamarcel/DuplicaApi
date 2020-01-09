@@ -46,8 +46,8 @@ const read = async (req, res, next) => {
 };
 
 const buildSavedUser = (savedUser) => {
-  const adminUser = _.pick(savedUser, ['_id', 'username']);
-  const token = signToken(adminUser._id);
+  const adminUser = _.pick(savedUser, ['_id', 'username', 'role']);
+  const token = signToken(adminUser);
   const auth = { token };
   return _.assign(adminUser, auth);
 };
