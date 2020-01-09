@@ -5,7 +5,7 @@ const setup = require('../../../tests/setup');
 const config = setup.initConfig();
 const logger = require('../../logger/logger')({ config });
 const middleware = require('../../middleware')({ config, logger });
-const app = require('../../server')({ config, logger, middleware });
+const app = require('../../server')({ middleware });
 const modelUtil = require('../../../tests/utils/util.model.integration');
 
 let admin;
@@ -30,6 +30,7 @@ describe('User API', () => {
     const user = {
       username: 'username_001',
       password: 'pass',
+      role: 'user',
     };
     const createdUser = await createUser(user);
     expect(createdUser.username).toEqual(user.username);
@@ -41,10 +42,12 @@ describe('User API', () => {
     const user = {
       username: 'username_002',
       password: 'pass',
+      role: 'user',
     };
     const user2 = {
       username: 'username_003',
       password: 'pass',
+      role: 'user',
     };
     const createdUser = await createUser(user);
     const createdUser2 = await createUser(user2);
@@ -67,6 +70,7 @@ describe('User API', () => {
     const user = {
       username: 'username_004',
       password: 'pass',
+      role: 'admin',
     };
     const createdUser = await createUser(user);
     await request(app)
@@ -87,6 +91,7 @@ describe('User API', () => {
     const user = {
       username: 'username_005',
       password: 'pass',
+      role: 'admin',
     };
     const createdUser = await createUser(user);
     const updatedUsername = 'testUsername005updated';
@@ -109,6 +114,7 @@ describe('User API', () => {
     const user = {
       username: 'username_006',
       password: 'pass',
+      role: 'user',
     };
     const createdUser = await createUser(user);
     await request(app)
@@ -129,6 +135,7 @@ describe('User API', () => {
     const user = {
       username: 'username_007',
       password: 'pass',
+      role: 'admin',
     };
     await createUser(user);
     await request(app)
@@ -152,6 +159,7 @@ describe('User API', () => {
       .send({
         username,
         password: '12345',
+        role: 'user',
       })
       .set('Authorization', `Bearer ${admin.token}`)
       .set('Accept', 'application/json')
@@ -164,6 +172,29 @@ describe('User API', () => {
         expect(response.body.errors[0].param).toEqual('username');
         expect(response.body.errors[0].value).toEqual('');
         expect(response.body.errors[0].msg).toEqual('Username is required');
+        done();
+      });
+  });
+
+  it('Should throw Role is required error when try to create an user without role', async (done) => {
+    await request(app)
+      .post('/api/users')
+      .send({
+        username: 'username_008',
+        password: '12345',
+        role: '',
+      })
+      .set('Authorization', `Bearer ${admin.token}`)
+      .set('Accept', 'application/json')
+      .expect(422)
+      .then((response) => {
+        expect(response.body).toBeDefined();
+        expect(response.body.errors).toBeDefined();
+        expect(response.body.errors).toHaveLength(1);
+        expect(response.body.errors[0].location).toEqual('body');
+        expect(response.body.errors[0].param).toEqual('role');
+        expect(response.body.errors[0].value).toEqual('');
+        expect(response.body.errors[0].msg).toEqual('Role is required');
         done();
       });
   });

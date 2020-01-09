@@ -32,6 +32,7 @@ const createUserManager = async () => {
   await userController.createManagerUser({
     username: config.userManager,
     password: config.passManager,
+    role: config.roleManager,
   });
   logger.info('User manager created.');
 };

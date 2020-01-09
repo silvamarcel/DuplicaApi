@@ -78,7 +78,7 @@ describe('User Controller API', () => {
     const genericError = new Error('Any error!');
     mockingoose.users.toReturn(genericError, 'save');
     req = {
-      body: { username: 'myUsername', password: 'myPassword' },
+      body: { username: 'myUsername', password: 'myPassword', role: 'myRole' },
     };
     next = (error) => {
       expect(error).toBeDefined();

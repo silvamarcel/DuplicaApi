@@ -14,7 +14,11 @@ const decodeToken = () => (req, res, next) => {
   checkToken(req, res, next);
 };
 
-const signToken = id => jwt.sign({ _id: id }, config.secrets.jwt, { expiresIn: config.expireTime });
+const signToken = ({ _id, username, role }) => jwt.sign(
+  { _id, username, role },
+  config.secrets.jwt,
+  { expiresIn: config.expireTime },
+);
 
 const goNext = (user, req, next) => {
   req.user = user;
