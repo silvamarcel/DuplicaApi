@@ -1,15 +1,7 @@
 const express = require('express');
-const acl = require('express-acl');
 
-const { auth, authRoutes } = require('./auth');
+const { auth, authRoutes, authorization } = require('./auth');
 const api = require('./api');
-
-const aclOptions = {
-  filename: 'acl.json',
-  path: 'server/config',
-  baseUrl: 'api',
-  decodedObjectName: 'user',
-};
 
 const server = ({ middleware }) => {
   const app = express();
@@ -21,9 +13,7 @@ const server = ({ middleware }) => {
   app.use('/auth/', authRoutes);
   app.use(auth.decodeToken());
 
-  // Setup of the Access Control List configuration
-  acl.config(aclOptions);
-  app.use(acl.authorize.unless({ path: ['/auth/signin'] }));
+  app.use(authorization());
 
   // Setup the api routes
   app.use('/api/', api());
