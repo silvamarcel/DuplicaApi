@@ -1,19 +1,19 @@
 const express = require('express');
 
-const { auth, authRoutes, authorization } = require('./auth');
+const { authRoutes, auth } = require('./auth');
 const api = require('./api');
 
 const server = ({ middleware }) => {
   const app = express();
 
-  // Setup the app middleware's
+  // Setup the app's middlewares
   middleware.appMiddleware(app);
 
-  // Setup of Authentication Verification
+  // Setup of the authentication routes
   app.use('/auth/', authRoutes);
-  app.use(auth.decodeToken());
 
-  app.use(authorization());
+  // Setup of the authentication middleware
+  app.use(auth);
 
   // Setup the api routes
   app.use('/api/', api());
