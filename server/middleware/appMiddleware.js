@@ -1,4 +1,5 @@
 const morgan = require('morgan');
+const helmet = require('helmet');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const override = require('method-override');
@@ -19,6 +20,10 @@ const addMorgan = () => {
   }));
 };
 
+const addHelmet = () => {
+  middlewares.push(helmet());
+};
+
 const addBodyParser = () => {
   middlewares.push(bodyParser.urlencoded({ extended: true }));
   middlewares.push(bodyParser.json());
@@ -35,6 +40,7 @@ const addRequestsMiddlewares = () => {
 
 module.exports = ({ config }) => () => {
   if (!testing(config)) addMorgan();
+  addHelmet();
   addBodyParser();
   addValidators();
   addRequestsMiddlewares();
