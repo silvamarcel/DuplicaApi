@@ -1,5 +1,5 @@
 const config = require('../server/config/config');
-const logger = require('../server/logger/logger')({ config });
+const logger = require('../server/log/logger')({ config });
 const dbTest = require('../server/store/database')({ config });
 const userController = require('../server/api/user/userController');
 

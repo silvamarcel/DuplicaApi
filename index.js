@@ -1,6 +1,6 @@
 const config = require('./server/config/config');
 const Database = require('./server/store/database');
-const Logger = require('./server/logger/logger');
+const Logger = require('./server/log/logger');
 const Middleware = require('./server/middleware');
 const App = require('./server/server');
 
