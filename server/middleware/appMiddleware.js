@@ -6,34 +6,37 @@ const expressValidator = require('express-validator');
 
 const testing = config => config.env === 'testing';
 
-const addMorgan = (app) => {
-  app.use(morgan('combined', {
+const middlewares = [];
+
+const addMorgan = () => {
+  middlewares.push(morgan('combined', {
     skip: (req, res) => res.statusCode < 400,
     stream: process.stderr,
   }));
-  app.use(morgan('combined', {
+  middlewares.push(morgan('combined', {
     skip: (req, res) => res.statusCode >= 400,
     stream: process.stdout,
   }));
 };
 
-const addBodyParser = (app) => {
-  app.use(bodyParser.urlencoded({ extended: true }));
-  app.use(bodyParser.json());
+const addBodyParser = () => {
+  middlewares.push(bodyParser.urlencoded({ extended: true }));
+  middlewares.push(bodyParser.json());
 };
 
-const addValidators = (app) => {
-  app.use(expressValidator());
+const addValidators = () => {
+  middlewares.push(expressValidator());
 };
 
-const addRequestsMiddlewares = (app) => {
-  app.use(cors());
-  app.use(override());
+const addRequestsMiddlewares = () => {
+  middlewares.push(cors());
+  middlewares.push(override());
 };
 
-module.exports = ({ config }) => (app) => {
-  if (!testing(config)) addMorgan(app);
-  addBodyParser(app);
-  addValidators(app);
-  addRequestsMiddlewares(app);
+module.exports = ({ config }) => () => {
+  if (!testing(config)) addMorgan();
+  addBodyParser();
+  addValidators();
+  addRequestsMiddlewares();
+  return middlewares;
 };

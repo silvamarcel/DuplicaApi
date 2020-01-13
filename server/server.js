@@ -7,7 +7,7 @@ const server = ({ middleware }) => {
   const app = express();
 
   // Setup the app's middlewares
-  middleware.appMiddleware(app);
+  app.use(middleware.appMiddleware());
 
   // Setup of the authentication routes
   app.use('/auth/', authRoutes);
