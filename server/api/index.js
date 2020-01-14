@@ -2,9 +2,9 @@ const router = require('express').Router();
 const userRoutes = require('./user/userRoutes');
 const factoryRoutes = require('./factory/factoryRoutes');
 
-const apiRoutes = () => {
-  router.use('/users', userRoutes());
-  router.use('/factories', factoryRoutes());
+const apiRoutes = ({ middleware }) => {
+  router.use('/users', userRoutes({ middleware }));
+  router.use('/factories', factoryRoutes({ middleware }));
   return router;
 };
 

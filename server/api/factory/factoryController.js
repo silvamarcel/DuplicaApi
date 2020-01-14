@@ -3,7 +3,7 @@ const _ = require('lodash');
 
 const Factory = require('./factoryModel');
 const appError = require('../../utils/error');
-const appValidation = require('../../utils/validation');
+const appValidation = require('../../middleware/validation');
 const { signToken } = require('../../auth/auth');
 
 const goNext = (factory, req, next) => {

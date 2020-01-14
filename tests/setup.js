@@ -1,7 +1,8 @@
 const config = require('../server/config/config');
 const logger = require('../server/log/logger')({ config });
 const dbTest = require('../server/store/database')({ config });
-const userController = require('../server/api/user/userController');
+const middleware = require('../server/middleware')({ config, logger });
+const userController = require('../server/api/user/userController')({ middleware });
 
 const initConfig = () => {
   logger.info('Initializing config files for test...');

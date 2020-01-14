@@ -16,7 +16,7 @@ const server = ({ middleware }) => {
   app.use(auth);
 
   // Setup the api routes
-  app.use('/api/', api());
+  app.use('/api/', api({ middleware }));
 
   // Setup the global error handling
   app.use(middleware.errorHandlingMiddleware);

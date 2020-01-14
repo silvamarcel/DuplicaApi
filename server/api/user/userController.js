@@ -3,7 +3,6 @@ const _ = require('lodash');
 
 const User = require('./userModel');
 const appError = require('../../utils/error');
-const appValidation = require('../../utils/validation');
 const { signToken } = require('../../auth/auth');
 
 const goNext = (user, req, next) => {
@@ -37,13 +36,6 @@ const list = async (req, res, next) => {
     .catch(appError.catchError(next));
 };
 
-const read = async (req, res, next) => {
-  if (!req.leanUser) {
-    await next(appError.buildError(null, 404, 'User not found!'));
-  } else {
-    await res.json(req.leanUser);
-  }
-};
 
 const buildSavedUser = (savedUser) => {
   const adminUser = _.pick(savedUser, ['_id', 'username', 'role']);
@@ -58,16 +50,8 @@ const save = async (user, res, next) => {
     .catch(appError.catchError(next, 'Username already exists.'));
 };
 
-const update = async (req, res, next) => {
-  appValidation.validateRequest(req, res);
-  const { userModel } = req;
-  const updateUser = req.body;
-  _.merge(userModel, updateUser);
-  await save(userModel, res, next);
-};
-
-const create = async (req, res, next) => {
-  appValidation.validateRequest(req, res);
+const create = middleware => async (req, res, next) => {
+  await middleware.appValidation.validateRequest(req, res);
   await save(new User(req.body), res, next);
 };
 
@@ -76,19 +60,37 @@ const createManagerUser = async (data) => {
     .then(savedUser => buildSavedUser(savedUser));
 };
 
+const read = async (req, res, next) => {
+  if (!req.leanUser) {
+    await next(appError.buildError(null, 404, 'User not found!'));
+  } else {
+    await res.json(req.leanUser);
+  }
+};
+
+const update = middleware => async (req, res, next) => {
+  await middleware.appValidation.validateRequest(req, res);
+  const { userModel } = req;
+  const updateUser = req.body;
+  _.merge(userModel, updateUser);
+  await save(userModel, res, next);
+};
+
 const deleteUser = async (req, res, next) => {
   await req.userModel.remove()
     .then(removedUser => res.json(removedUser))
     .catch(appError.catchError(next));
 };
 
-module.exports = {
+const userController = ({ middleware }) => ({
   params,
   me,
   list,
-  create,
+  create: create(middleware),
   createManagerUser,
   read,
-  update,
+  update: update(middleware),
   delete: deleteUser,
-};
+});
+
+module.exports = userController;
