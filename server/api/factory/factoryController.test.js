@@ -1,7 +1,11 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id", "_doc"] }] */
 const mockingoose = require('mockingoose').default;
-const factoryController = require('./factoryController');
+const appError = require('../../error');
+const auth = require('../../auth');
+const FactoryController = require('./factoryController');
 
+let factoryController;
+let middleware;
 let req = null;
 let res = null;
 let next = null;
@@ -9,9 +13,15 @@ let next = null;
 describe('Factory Controller API', () => {
   beforeEach(() => {
     mockingoose.resetAll();
+    middleware = {
+      appValidation: {
+        validateRequest: jest.fn(),
+      },
+    };
     req = jest.fn();
     res = jest.fn();
     next = jest.fn();
+    factoryController = FactoryController({ middleware, appError, auth });
   });
 
   it('Should return an error APIError with status 403 and Invalid id when an CastError occurs', async () => {

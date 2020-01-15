@@ -1,8 +1,10 @@
 const router = require('express').Router();
-const userController = require('./userController');
+const UserController = require('./userController');
 const userValidator = require('./userValidator');
 
-const userRoutes = () => {
+const userRoutes = ({ middleware, appError, auth }) => {
+  const userController = UserController({ middleware, appError, auth });
+
   router.param('id', userController.params);
   router.get('/me', userController.me);
 

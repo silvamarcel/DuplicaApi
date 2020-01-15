@@ -1,4 +1,4 @@
-const error = require('./error');
+const error = require('.');
 
 describe('error.js', () => {
   it('Should build unknown error', () => {

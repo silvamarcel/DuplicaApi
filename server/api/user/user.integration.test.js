@@ -3,9 +3,10 @@ const request = require('supertest');
 const setup = require('../../../tests/setup');
 
 const config = setup.initConfig();
-const logger = require('../../logger/logger')({ config });
+const appError = require('../../error');
+const logger = require('../../log/logger')({ config });
 const middleware = require('../../middleware')({ config, logger });
-const app = require('../../server')({ middleware });
+const app = require('../../server')({ middleware, appError });
 const modelUtil = require('../../../tests/utils/util.model.integration');
 
 let admin;
