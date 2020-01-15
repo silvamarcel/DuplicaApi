@@ -2,9 +2,8 @@
 const _ = require('lodash');
 
 const User = require('./userModel');
-const { signToken } = require('../../auth/auth');
 
-const userController = ({ middleware, appError }) => {
+const userController = ({ middleware, appError, auth }) => {
   const goNext = (user, req, next) => {
     req.userModel = user;
     req.leanUser = user.toObject();
@@ -39,9 +38,8 @@ const userController = ({ middleware, appError }) => {
 
   const buildSavedUser = (savedUser) => {
     const adminUser = _.pick(savedUser, ['_id', 'username', 'role']);
-    const token = signToken(adminUser);
-    const auth = { token };
-    return _.assign(adminUser, auth);
+    const token = auth.signToken(adminUser);
+    return _.assign(adminUser, { token });
   };
 
   const save = async (user, res, next) => {

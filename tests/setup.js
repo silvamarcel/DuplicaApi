@@ -1,8 +1,10 @@
 const config = require('../server/config/config');
+const appError = require('../server/error');
+const auth = require('../server/auth');
 const logger = require('../server/log/logger')({ config });
 const dbTest = require('../server/store/database')({ config });
 const middleware = require('../server/middleware')({ config, logger });
-const userController = require('../server/api/user/userController')({ middleware });
+const UserController = require('../server/api/user/userController');
 
 const initConfig = () => {
   logger.info('Initializing config files for test...');
@@ -29,6 +31,7 @@ const initModels = async () => {
 };
 
 const createUserManager = async () => {
+  const userController = UserController({ middleware, appError, auth });
   logger.info('Creating user manager...');
   await userController.createManagerUser({
     username: config.userManager,

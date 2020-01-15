@@ -1,6 +1,6 @@
 const express = require('express');
 
-const { authRoutes, auth } = require('./auth');
+const auth = require('./auth');
 const api = require('./api');
 
 const server = ({ middleware, appError }) => {
@@ -10,13 +10,13 @@ const server = ({ middleware, appError }) => {
   app.use(middleware.appMiddleware());
 
   // Setup of the authentication routes
-  app.use('/auth/', authRoutes);
+  app.use('/auth/', auth.authRoutes);
 
   // Setup of the authentication middleware
-  app.use(auth);
+  app.use(auth.authMiddleware);
 
   // Setup the api routes
-  app.use('/api/', api({ middleware, appError }));
+  app.use('/api/', api({ middleware, appError, auth }));
 
   // Setup the global error handling
   app.use(middleware.errorHandlingMiddleware);

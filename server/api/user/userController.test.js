@@ -1,6 +1,7 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id", "_doc"] }] */
 const mockingoose = require('mockingoose').default;
 const appError = require('../../error');
+const auth = require('../../auth');
 const UserController = require('./userController');
 
 let userController;
@@ -20,7 +21,7 @@ describe('User Controller API', () => {
     req = jest.fn();
     res = jest.fn();
     next = jest.fn();
-    userController = UserController({ middleware, appError });
+    userController = UserController({ middleware, appError, auth });
   });
 
   it('Should return an error APIError with status 403 and Invalid id when an CastError occurs', async () => {
