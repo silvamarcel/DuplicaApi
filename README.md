@@ -2,7 +2,7 @@
 
 ## API Status
 [![Build Status](https://semaphoreci.com/api/v1/projects/4e026b91-5c75-4da2-be18-6061995043c6/2033921/shields_badge.svg)](https://semaphoreci.com/silvamarcel/duplicaapi)
-[![codebeat badge](https://codebeat.co/badges/817412a1-3f69-4966-b916-8f07621a8b46)](https://codebeat.co/projects/github-com-silvamarcel-duplicaapi-master)
+[![CodeFactor](https://www.codefactor.io/repository/github/silvamarcel/duplicaapi/badge)](https://www.codefactor.io/repository/github/silvamarcel/duplicaapi)
 
 ## Table of contents
 
