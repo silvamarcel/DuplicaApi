@@ -62,8 +62,10 @@ It automatically deploys the code to Staging when it is committed in the Master 
         ├── api                 # API Modules/Routers/Features files
         ├── auth                # Authentication files
         ├── config              # Config files
+        ├── error               # Error builder, handler and types
+        ├── log                 # Loggers
         ├── middleware          # Middlewares of the application
-        ├── utils               # Tools and utilities
+        ├── store               # Stores e.g. Database
         ├── server.js           # Server definition file of the application
     ├── tests                   # Setup, tools and utilities for tests
         ├── utils               # Tools and utilities for tests
