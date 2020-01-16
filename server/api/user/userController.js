@@ -37,9 +37,9 @@ const userController = ({ middleware, appError, auth }) => {
 
 
   const buildSavedUser = (savedUser) => {
-    const adminUser = _.pick(savedUser, ['_id', 'username', 'role']);
-    const token = auth.signToken(adminUser);
-    return _.assign(adminUser, { token });
+    const user = _.pick(savedUser, ['_id', 'username', 'role']);
+    const token = auth.signToken(user);
+    return _.assign(user, { token });
   };
 
   const save = async (user, res, next) => {
