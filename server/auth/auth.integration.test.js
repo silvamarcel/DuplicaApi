@@ -63,8 +63,8 @@ describe('Authentication API', () => {
       .set('Accept', 'application/json')
       .expect(401)
       .then((response) => {
-        expect(response.error).toBeDefined();
-        expect(response.error.text).toEqual('Invalid username and/or password');
+        expect(response.body).toBeDefined();
+        expect(response.body).toEqual({ error: 'Invalid username and/or password' });
         done();
       });
   });
@@ -81,8 +81,8 @@ describe('Authentication API', () => {
       .set('Accept', 'application/json')
       .expect(400)
       .then((response) => {
-        expect(response.error).toBeDefined();
-        expect(response.error.text).toEqual('You need an username and password');
+        expect(response.body).toBeDefined();
+        expect(response.body).toEqual({ error: 'You need an username and password' });
         done();
       });
   });

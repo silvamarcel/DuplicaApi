@@ -50,7 +50,7 @@ describe('Authentication API', () => {
     const next = jest.fn();
     await auth.getFreshUser()(req, res, next);
     expect(status).toEqual(401);
-    expect(text).toEqual('Unauthorized');
+    expect(text).toEqual({ error: 'Unauthorized' });
   });
 
   it('Should call next with err when User.findById throws an error on getFreshUser', async () => {
