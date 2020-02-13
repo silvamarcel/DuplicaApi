@@ -26,7 +26,7 @@ const goNext = (user, req, next) => {
 };
 
 const errorStatus = (res, code, message) => {
-  res.status(code).send(message);
+  res.status(code).send({ error: message });
   return null;
 };
 
