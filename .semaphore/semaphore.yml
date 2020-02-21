@@ -10,9 +10,6 @@ blocks:
       jobs:
         - name: Install
           commands:
-            - checkout
-            - sem-version node 12
-            - cache restore
             - npm install
             - npm install -g nodemon
             - sem-service start mongodb --db=duplicatest
@@ -20,6 +17,11 @@ blocks:
             - mongo duplicatest --eval "db.dropDatabase();"
             - cache store
             - npm run build --if-present
+      prologue:
+        commands:
+          - checkout
+          - sem-version node 12.3.1
+          - cache restore
   - name: Test application
     task:
       prologue:
@@ -35,6 +37,7 @@ blocks:
       prologue:
         commands:
           - checkout
+          - sem-version node 12.3.1
           - cache restore
       jobs:
         - name: Build
