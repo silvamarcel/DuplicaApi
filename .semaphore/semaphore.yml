@@ -20,6 +20,7 @@ blocks:
       prologue:
         commands:
           - checkout
+          - nvm install 12.3.1
           - sem-version node 12.3.1
           - cache restore
   - name: Test application
@@ -27,6 +28,8 @@ blocks:
       prologue:
         commands:
           - checkout
+          - nvm install 12.3.1
+          - sem-version node 12.3.1
           - cache restore
       jobs:
         - name: Test
@@ -37,6 +40,7 @@ blocks:
       prologue:
         commands:
           - checkout
+          - nvm install 12.3.1
           - sem-version node 12.3.1
           - cache restore
       jobs:
