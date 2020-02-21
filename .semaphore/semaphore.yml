@@ -15,6 +15,7 @@ blocks:
             - cache restore
             - npm install
             - npm install -g nodemon
+            - sem-service start mongodb --db=duplicatest
             - mongo duplicatest --eval "db.dropDatabase();"
             - cache store
             - npm run build --if-present
