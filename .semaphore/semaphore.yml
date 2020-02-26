@@ -32,6 +32,7 @@ blocks:
           - sem-version node 12.3.1
           - cache restore
           - sem-service start mongodb --db=duplicatest
+          - sudo apt-get install -y -qq mongodb-clients
           - mongo duplicatest --eval "db.dropDatabase();"
       jobs:
         - name: Test
