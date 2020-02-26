@@ -31,6 +31,8 @@ blocks:
           - nvm install 12.3.1
           - sem-version node 12.3.1
           - cache restore
+          - sem-service start mongodb --db=duplicatest
+          - mongo duplicatest --eval "db.dropDatabase();"
       jobs:
         - name: Test
           commands:
@@ -49,6 +51,6 @@ blocks:
             - docker build -t duplica-api .
 promotions:
   - name: Staging
-    pipeline_file: pipeline_2.yml
+    pipeline_file: staging-deploy.yml
     auto_promote:
       when: branch = 'master' AND result = 'passed'
