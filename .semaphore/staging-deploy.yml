@@ -1,13 +1,28 @@
 version: v1.0
-name: Pipeline 2
-blocks:
-  - name: 'Block #1'
-    task:
-      jobs:
-        - name: 'Job #1'
-          commands:
-            - echo "job 1"
+name: Staging deployment
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu1804
+
+blocks:
+  - name: 'Deploy'
+    task:
+      secrets:
+        - name: DuplicaApi
+      prologue:
+        commands:
+          - checkout --use-cache
+          - nvm install 12.3.1
+          - sem-version node 12.3.1
+          - cache restore
+      jobs:
+        - name: 'Deploying to Heroku'
+          commands:
+            - npm install -g heroku
+            - docker build -t duplica-api .
+            - docker images
+            - docker tag duplica-api registry.heroku.com/staging-duplica-api/web
+            - docker push registry.heroku.com/staging-duplica-api/web
+            - echo -n "machine api.heroku.com login $HEROKU_USER password $HEROKU_PASS machine git.heroku.com login $HEROKU_USER password $HEROKU_PASS" > ~/.netrc
+            - heroku container:release web --app=staging-duplica-api
