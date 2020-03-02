@@ -23,6 +23,6 @@ blocks:
             - docker build -t duplica-api .
             - docker images
             - docker tag duplica-api registry.heroku.com/staging-duplica-api/web
+            - heroku container:login
             - docker push registry.heroku.com/staging-duplica-api/web
-            - echo -n "machine api.heroku.com login $HEROKU_USER password $HEROKU_PASS machine git.heroku.com login $HEROKU_USER password $HEROKU_PASS" > ~/.netrc
             - heroku container:release web --app=staging-duplica-api
