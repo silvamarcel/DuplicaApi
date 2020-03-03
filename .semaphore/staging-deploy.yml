@@ -23,6 +23,6 @@ blocks:
             - docker build -t duplica-api .
             - docker images
             - docker tag duplica-api registry.heroku.com/staging-duplica-api/web
-            - docker login --username=_ --password=$HEROKU_KEY registry.heroku.com
+            - echo "$HEROKU_API_KEY" | docker login --username "$HEROKU_USERNAME" --password-stdin registry.heroku.com
             - docker push registry.heroku.com/staging-duplica-api/web
             - heroku container:release web --app=staging-duplica-api
