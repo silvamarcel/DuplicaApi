@@ -23,6 +23,17 @@ const user = {
   role: 'user',
 };
 
+const validateFactoryWithoutName = done => (response) => {
+  expect(response.body).toBeDefined();
+  expect(response.body.errors).toBeDefined();
+  expect(response.body.errors).toHaveLength(1);
+  expect(response.body.errors[0].location).toEqual('body');
+  expect(response.body.errors[0].param).toEqual('name');
+  expect(response.body.errors[0].value).toEqual('');
+  expect(response.body.errors[0].msg).toEqual('Factory name is required');
+  done();
+};
+
 describe('Factory API', () => {
   beforeAll(async () => {
     await setup.init();
@@ -150,16 +161,7 @@ describe('Factory API', () => {
       .set('Authorization', `Bearer ${loggedUser.token}`)
       .set('Accept', 'application/json')
       .expect(422)
-      .then((response) => {
-        expect(response.body).toBeDefined();
-        expect(response.body.errors).toBeDefined();
-        expect(response.body.errors).toHaveLength(1);
-        expect(response.body.errors[0].location).toEqual('body');
-        expect(response.body.errors[0].param).toEqual('name');
-        expect(response.body.errors[0].value).toEqual('');
-        expect(response.body.errors[0].msg).toEqual('Factory name is required');
-        done();
-      });
+      .then(validateFactoryWithoutName(done));
   });
 
   it('Should throw name is required error when try to update a factory without name', async (done) => {
@@ -171,15 +173,6 @@ describe('Factory API', () => {
       .set('Accept', 'application/json')
       .set('Authorization', `Bearer ${loggedUser.token}`)
       .expect(422)
-      .then((response) => {
-        expect(response.body).toBeDefined();
-        expect(response.body.errors).toBeDefined();
-        expect(response.body.errors).toHaveLength(1);
-        expect(response.body.errors[0].location).toEqual('body');
-        expect(response.body.errors[0].param).toEqual('name');
-        expect(response.body.errors[0].value).toEqual('');
-        expect(response.body.errors[0].msg).toEqual('Factory name is required');
-        done();
-      });
+      .then(validateFactoryWithoutName(done));
   });
 });
