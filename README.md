@@ -1,7 +1,7 @@
 # API Documentation
 
 ## API Status
-[![Build Status](https://semaphoreci.com/api/v1/projects/4e026b91-5c75-4da2-be18-6061995043c6/2033921/shields_badge.svg)](https://semaphoreci.com/silvamarcel/duplicaapi)
+[![Build Status](https://duplica.semaphoreci.com/badges/DuplicaApi.svg)](https://semaphoreci.com/silvamarcel/duplicaapi)
 [![CodeFactor](https://www.codefactor.io/repository/github/silvamarcel/duplicaapi/badge)](https://www.codefactor.io/repository/github/silvamarcel/duplicaapi)
 
 ## Table of contents
