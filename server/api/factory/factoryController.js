@@ -34,7 +34,12 @@ const factoryController = ({ middleware, appError }) => {
   const save = async (factoryModel, res, next) => {
     await factoryModel.save()
       .then((savedFactory) => {
-        const factory = _.pick(savedFactory, ['_id', 'name']);
+        const factory = _.pick(savedFactory, [
+          '_id',
+          'businessId',
+          'name',
+          'contract',
+        ]);
         return res.json(factory);
       })
       .catch(appError.catchError(next, 'A factory with this name already exists.'));

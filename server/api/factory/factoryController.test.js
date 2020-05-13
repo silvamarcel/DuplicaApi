@@ -77,8 +77,6 @@ describe('Factory Controller API', () => {
     const remove = jest.fn(() => Promise.reject(error));
 
     req = { factory: { remove } };
-    res = jest.fn();
-    next = jest.fn();
     await factoryController.delete(req, res, next);
     expect(next).toHaveBeenCalledWith(error);
   });
@@ -87,7 +85,11 @@ describe('Factory Controller API', () => {
     const genericError = new Error('Any error!');
     mockingoose.factories.toReturn(genericError, 'save');
     req = {
-      body: { name: 'myFactory' },
+      body: {
+        businessId: 'myBusinessId',
+        name: 'myFactory',
+        contract: 'myContract',
+      },
     };
     next = (error) => {
       expect(error).toBeDefined();
