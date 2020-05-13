@@ -37,14 +37,14 @@ const validateFactory = (expectedFactory, factory) => {
   expect(expectedFactory.contract).toEqual(factory.contract);
 };
 
-const validateFactoryWithoutName = done => (response) => {
+const validateFactoryMissingField = (field, done) => (response) => {
   expect(response.body).toBeDefined();
   expect(response.body.errors).toBeDefined();
   expect(response.body.errors).toHaveLength(1);
   expect(response.body.errors[0].location).toEqual('body');
-  expect(response.body.errors[0].param).toEqual('name');
+  expect(response.body.errors[0].param).toEqual(field);
   expect(response.body.errors[0].value).toEqual('');
-  expect(response.body.errors[0].msg).toEqual('Factory name is required');
+  expect(response.body.errors[0].msg).toEqual(`Factory ${field} is required`);
   done();
 };
 
@@ -98,10 +98,10 @@ describe('Factory API', () => {
   it('Should update a factory', async (done) => {
     const factory = factorySeed.getNextFactory();
     const createdFactory = await createFactory(factory);
-    const updatedFactoryName = `${factory.name}_Updated`;
-    await put(app, `/api/factories/${createdFactory._id}`, { name: updatedFactoryName }, loggedUser.token)
+    factory.name = `${factory.name}_Updated`;
+    await put(app, `/api/factories/${createdFactory._id}`, factory, loggedUser.token)
       .expect(200)
-      .then(getResolve({ ...createdFactory, name: updatedFactoryName }, done));
+      .then(getResolve({ ...createdFactory, name: factory.name }, done));
   });
 
   it('Should delete a factory', async (done) => {
@@ -131,18 +131,48 @@ describe('Factory API', () => {
       });
   });
 
+  it('Should throw businessId is required error when try to create a factory without businessId', async (done) => {
+    const factory = factorySeed.getNextFactory();
+    await post(app, '/api/factories', { ...factory, businessId: '' }, loggedUser.token)
+      .expect(422)
+      .then(validateFactoryMissingField('businessId', done));
+  });
+
   it('Should throw name is required error when try to create a factory without name', async (done) => {
     const factory = factorySeed.getNextFactory();
     await post(app, '/api/factories', { ...factory, name: '' }, loggedUser.token)
       .expect(422)
-      .then(validateFactoryWithoutName(done));
+      .then(validateFactoryMissingField('name', done));
+  });
+
+  it('Should throw contract is required error when try to create a factory without contract', async (done) => {
+    const factory = factorySeed.getNextFactory();
+    await post(app, '/api/factories', { ...factory, contract: '' }, loggedUser.token)
+      .expect(422)
+      .then(validateFactoryMissingField('contract', done));
+  });
+
+  it('Should throw businessId is required error when try to update a factory without businessId', async (done) => {
+    const factory = factorySeed.getNextFactory();
+    const createdFactory = await createFactory(factory);
+    await put(app, `/api/factories/${createdFactory._id}`, { ...factory, businessId: '' }, loggedUser.token)
+      .expect(422)
+      .then(validateFactoryMissingField('businessId', done));
   });
 
   it('Should throw name is required error when try to update a factory without name', async (done) => {
     const factory = factorySeed.getNextFactory();
     const createdFactory = await createFactory(factory);
-    await put(app, `/api/factories/${createdFactory._id}`, { name: '' }, loggedUser.token)
+    await put(app, `/api/factories/${createdFactory._id}`, { ...factory, name: '' }, loggedUser.token)
       .expect(422)
-      .then(validateFactoryWithoutName(done));
+      .then(validateFactoryMissingField('name', done));
+  });
+
+  it('Should throw contract is required error when try to update a factory without contract', async (done) => {
+    const factory = factorySeed.getNextFactory();
+    const createdFactory = await createFactory(factory);
+    await put(app, `/api/factories/${createdFactory._id}`, { ...factory, contract: '' }, loggedUser.token)
+      .expect(422)
+      .then(validateFactoryMissingField('contract', done));
   });
 });
