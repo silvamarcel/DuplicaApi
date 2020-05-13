@@ -5,6 +5,7 @@ const logger = require('../server/log/logger')({ config });
 const dbTest = require('../server/store/database')({ config });
 const middleware = require('../server/middleware')({ config, logger });
 const UserController = require('../server/api/user/userController');
+const seeds = require('./seeds');
 
 const initConfig = () => {
   logger.info('Initializing config files for test...');
@@ -72,4 +73,5 @@ module.exports = {
   init,
   initConfig,
   close,
+  seeds,
 };
