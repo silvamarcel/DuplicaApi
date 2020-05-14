@@ -4,7 +4,7 @@ const factoryRoutes = require('./factory/factoryRoutes');
 
 const apiRoutes = ({ middleware, appError, auth }) => {
   router.use('/users', userRoutes({ middleware, appError, auth }));
-  router.use('/factories', factoryRoutes({ middleware, appError, auth }));
+  router.use('/factories', factoryRoutes({ middleware, appError }));
   return router;
 };
 
