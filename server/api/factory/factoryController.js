@@ -39,6 +39,8 @@ const factoryController = ({ middleware, appError }) => {
           'businessId',
           'name',
           'contract',
+          'address',
+          'contact',
         ]);
         return res.json(factory);
       })
