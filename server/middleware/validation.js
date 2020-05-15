@@ -1,4 +1,4 @@
-const { validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator');
 
 const validateRequest = async (req, res) => {
   const errors = await validationResult(req);

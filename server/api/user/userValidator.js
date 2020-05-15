@@ -1,4 +1,4 @@
-const { check } = require('express-validator/check');
+const { check } = require('express-validator');
 
 const validateCreateOrUpdate = [
   check('username', 'Username is required').not().isEmpty(),

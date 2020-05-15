@@ -1,7 +1,7 @@
 const has = error => error && error.name;
 const is = (error, name) => has(error) && error.name === name;
 
-const buildError = (logger, status, message) => {
+const buildError = (logger, status = 500, message) => {
   logger.error(`${status} | ${message}`);
   return {
     status,
@@ -27,12 +27,8 @@ const verifyMongoDBErrors = ({ logger, err }) => {
 };
 
 const verifyAPIErrors = ({ logger, err }) => {
-  if (is(err, 'APIError')) {
-    if (err.status) {
-      throw buildError(logger, err.status, err.message);
-    } else {
-      throw buildError(logger, 500, err.message);
-    }
+  if (has(err) || is(err, 'APIError')) {
+    throw buildError(logger, err.status, err.message);
   }
 };
 
