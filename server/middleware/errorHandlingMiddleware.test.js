@@ -75,4 +75,15 @@ describe('errorHandling.js', () => {
     errorHandlingMiddleware(error, null, res, next);
     expect(next).toHaveBeenCalled();
   });
+
+  it('Should return an Unknown Error', () => {
+    error = {
+      code: null,
+      name: 'UnknownError',
+      message: 'Unknown error',
+    };
+    errorHandlingMiddleware(error, null, res, next);
+    expect(values.status).toEqual(500);
+    expect(values.message).toEqual('Unknown error');
+  });
 });

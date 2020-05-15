@@ -37,14 +37,24 @@ const validateFactory = (expectedFactory, factory) => {
   expect(expectedFactory.contract).toEqual(factory.contract);
 };
 
-const validateFactoryMissingField = (field, done) => (response) => {
+const validateFactoryField = field => (response) => {
   expect(response.body).toBeDefined();
   expect(response.body.errors).toBeDefined();
   expect(response.body.errors).toHaveLength(1);
   expect(response.body.errors[0].location).toEqual('body');
   expect(response.body.errors[0].param).toEqual(field);
   expect(response.body.errors[0].value).toEqual('');
+};
+
+const validateFactoryMissingField = (field, done) => (response) => {
+  validateFactoryField(field);
   expect(response.body.errors[0].msg).toEqual(`Factory ${field} is required`);
+  done();
+};
+
+const validateFactoryInvalidZipCode = done => (response) => {
+  validateFactoryField('address.zipCode');
+  expect(response.body.errors[0].msg).toEqual('Factory zipCode can only contains numbers');
   done();
 };
 
@@ -174,5 +184,17 @@ describe('Factory API', () => {
     await put(app, `/api/factories/${createdFactory._id}`, { ...factory, contract: '' }, loggedUser.token)
       .expect(422)
       .then(validateFactoryMissingField('contract', done));
+  });
+
+  it('Should throw zipCode can only contains numbers when try to update a factory with an invalid zipCode', async (done) => {
+    const factory = factorySeed.getNextFactory();
+    const createdFactory = await createFactory(factory);
+    const address = {
+      ...factory.address,
+      zipCode: 'invalidZipCode',
+    };
+    await put(app, `/api/factories/${createdFactory._id}`, { ...factory, address }, loggedUser.token)
+      .expect(422)
+      .then(validateFactoryInvalidZipCode(done));
   });
 });
