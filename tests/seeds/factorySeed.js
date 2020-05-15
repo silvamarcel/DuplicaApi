@@ -1,15 +1,16 @@
-let factorySeed = 10000;
+const factorySeed = ({ getSeed, getNextAddress, getNextContact }) => {
+  const getNextFactory = () => ({
+    businessId: `BusinessId_${getSeed()}`,
+    name: `FactoryName_${getSeed()}`,
+    contract: `Contract_${getSeed()}`,
+    address: getNextAddress(),
+    contact: getNextContact(),
+  });
 
-const getNextFactory = () => {
-  factorySeed += 1;
-  const factory = {
-    businessId: `BusinessId_${factorySeed}`,
-    name: `FactoryName_${factorySeed}`,
-    contract: `Contract_${factorySeed}`,
+  return {
+    getNextFactory,
   };
-  return factory;
 };
 
-module.exports = {
-  getNextFactory,
-};
+
+module.exports = factorySeed;
