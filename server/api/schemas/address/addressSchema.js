@@ -6,10 +6,13 @@ const AddressSchema = new Schema({
   zipCode: {
     type: Number,
   },
-  address: {
+  line1: {
     type: String,
   },
-  complement: {
+  number: {
+    type: String,
+  },
+  line2: {
     type: String,
   },
   neighborhood: {
