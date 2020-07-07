@@ -15,7 +15,7 @@ const AddressSchema = new Schema({
   line2: {
     type: String,
   },
-  neighborhood: {
+  suburb: {
     type: String,
   },
   city: {
