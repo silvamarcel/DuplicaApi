@@ -146,9 +146,9 @@ describe('User API', () => {
       .set('Authorization', `Bearer ${admin.token}`)
       .expect(403)
       .then((response) => {
-        expect(response.error).toBeDefined();
-        expect(response.text).toBeDefined();
-        expect(response.text).toEqual('Username already exists.');
+        expect(response.body).toBeDefined();
+        expect(response.body.error).toBeDefined();
+        expect(response.body.error.message).toEqual('Username already exists.');
         done();
       });
   });

@@ -2,9 +2,8 @@
 module.exports = expectedValues => ({
   status: (status) => {
     expectedValues.status = status;
-    const send = (message) => {
-      expectedValues.message = message;
-    };
-    return { send };
+  },
+  json: (message) => {
+    expectedValues.message = message.error.message;
   },
 });

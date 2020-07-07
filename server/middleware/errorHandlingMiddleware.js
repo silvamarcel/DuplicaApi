@@ -39,7 +39,10 @@ const errorHandlingMiddleware = ({ logger }) => (err, req, res, next) => {
     verifyAPIErrors({ logger, err });
     next();
   } catch (error) {
-    res.status(error.status).send(error.message);
+    res.status(error.status);
+    res.json({
+      error,
+    });
   }
 };
 

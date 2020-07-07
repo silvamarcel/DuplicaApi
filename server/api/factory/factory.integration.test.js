@@ -122,8 +122,9 @@ describe('Factory API', () => {
     await get(app, `/api/factories/${createdFactory._id}`, loggedUser.token)
       .expect(403)
       .then((response) => {
-        const { error } = response;
-        expect(error.text).toEqual('Invalid id');
+        expect(response.body).toBeDefined();
+        expect(response.body.error).toBeDefined();
+        expect(response.body.error.message).toEqual('Invalid id');
         done();
       });
   });
@@ -134,9 +135,9 @@ describe('Factory API', () => {
     await post(app, '/api/factories', factory, loggedUser.token)
       .expect(403)
       .then((response) => {
-        expect(response.error).toBeDefined();
-        expect(response.text).toBeDefined();
-        expect(response.text).toEqual('A factory with this name already exists.');
+        expect(response.body).toBeDefined();
+        expect(response.body.error).toBeDefined();
+        expect(response.body.error.message).toEqual('A factory with this name already exists.');
         done();
       });
   });

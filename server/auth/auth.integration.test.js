@@ -135,7 +135,9 @@ describe('Authentication API', () => {
       .query({ access_token: createdUser.token })
       .expect(403)
       .then((response) => {
-        expect(response.text).toEqual('Invalid id');
+        expect(response.body).toBeDefined();
+        expect(response.body.error).toBeDefined();
+        expect(response.body.error.message).toEqual('Invalid id');
         done();
       });
   });
