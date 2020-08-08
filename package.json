@@ -46,12 +46,27 @@
     "@babel/runtime": "^7.11.2",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.2.0",
+    "eslint-config-prettier": "^6.11.0",
     "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jest": "^22.21.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.2.5",
     "jest": "^26.2.2",
     "mockingoose": "^2.13.2",
     "nodemon": "^2.0.4",
+    "prettier": "^2.0.5",
+    "pretty-quick": "^2.0.1",
     "superagent": "^5.3.1",
     "supertest": "^4.0.2"
+  },
+  "engines": {
+    "node": ">=14",
+    "npm": ">=6.14.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run coverage && npm run lint && pretty-quick --staged",
+      "pre-push": "npm run lint"
+    }
   }
 }
