@@ -13,5 +13,4 @@ const addressSeed = ({ getSeed }) => {
   };
 };
 
-
 module.exports = addressSeed;

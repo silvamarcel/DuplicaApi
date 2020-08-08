@@ -11,11 +11,8 @@ const modelUtil = require('../../../tests/utils/util.model.integration');
 
 let admin;
 
-const createUser = user => modelUtil.create(
-  request(app),
-  user,
-  modelUtil.apiPaths.users,
-);
+const createUser = user =>
+  modelUtil.create(request(app), user, modelUtil.apiPaths.users);
 
 describe('User API', () => {
   beforeAll(async () => {
@@ -23,7 +20,7 @@ describe('User API', () => {
     admin = await modelUtil.getAdminUser(request(app));
   });
 
-  afterAll((done) => {
+  afterAll(done => {
     setup.close(done);
   });
 
@@ -39,7 +36,7 @@ describe('User API', () => {
     expect(createdUser.token).toBeDefined();
   });
 
-  it('Should find all users', async (done) => {
+  it('Should find all users', async done => {
     const user = {
       username: 'username_002',
       password: 'pass',
@@ -57,7 +54,7 @@ describe('User API', () => {
       .set('Accept', 'application/json')
       .set('Authorization', `Bearer ${admin.token}`)
       .expect(200)
-      .then((response) => {
+      .then(response => {
         const users = response.body;
         expect(users).toBeDefined();
         expect(users.length).toBeGreaterThanOrEqual(2);
@@ -67,7 +64,7 @@ describe('User API', () => {
       });
   });
 
-  it('Should find an user', async (done) => {
+  it('Should find an user', async done => {
     const user = {
       username: 'username_004',
       password: 'pass',
@@ -79,7 +76,7 @@ describe('User API', () => {
       .set('Accept', 'application/json')
       .set('Authorization', `Bearer ${createdUser.token}`)
       .expect(200)
-      .then((response) => {
+      .then(response => {
         const foundUser = response.body;
         expect(foundUser).toBeDefined();
         expect(foundUser._id).toEqual(createdUser._id);
@@ -88,7 +85,7 @@ describe('User API', () => {
       });
   });
 
-  it('Should update an user', async (done) => {
+  it('Should update an user', async done => {
     const user = {
       username: 'username_005',
       password: 'pass',
@@ -102,7 +99,7 @@ describe('User API', () => {
       .set('Accept', 'application/json')
       .set('Authorization', `Bearer ${createdUser.token}`)
       .expect(200)
-      .then((response) => {
+      .then(response => {
         const foundUser = response.body;
         expect(foundUser).toBeDefined();
         expect(foundUser._id).toEqual(createdUser._id);
@@ -111,7 +108,7 @@ describe('User API', () => {
       });
   });
 
-  it('Should find me', async (done) => {
+  it('Should find me', async done => {
     const user = {
       username: 'username_006',
       password: 'pass',
@@ -123,7 +120,7 @@ describe('User API', () => {
       .set('Accept', 'application/json')
       .set('Authorization', `Bearer ${createdUser.token}`)
       .expect(200)
-      .then((response) => {
+      .then(response => {
         const me = response.body;
         expect(me).toBeDefined();
         expect(me._id).toEqual(createdUser._id);
@@ -132,7 +129,7 @@ describe('User API', () => {
       });
   });
 
-  it('Should get an error when try to create the same user more than once', async (done) => {
+  it('Should get an error when try to create the same user more than once', async done => {
     const user = {
       username: 'username_007',
       password: 'pass',
@@ -145,7 +142,7 @@ describe('User API', () => {
       .set('Accept', 'application/json')
       .set('Authorization', `Bearer ${admin.token}`)
       .expect(403)
-      .then((response) => {
+      .then(response => {
         expect(response.body).toBeDefined();
         expect(response.body.error).toBeDefined();
         expect(response.body.error.message).toEqual('Username already exists.');
@@ -153,7 +150,7 @@ describe('User API', () => {
       });
   });
 
-  it('Should throw Username is required error when try to create an user without username', async (done) => {
+  it('Should throw Username is required error when try to create an user without username', async done => {
     const username = '';
     await request(app)
       .post('/api/users')
@@ -165,7 +162,7 @@ describe('User API', () => {
       .set('Authorization', `Bearer ${admin.token}`)
       .set('Accept', 'application/json')
       .expect(422)
-      .then((response) => {
+      .then(response => {
         expect(response.body).toBeDefined();
         expect(response.body.errors).toBeDefined();
         expect(response.body.errors).toHaveLength(1);
@@ -177,7 +174,7 @@ describe('User API', () => {
       });
   });
 
-  it('Should throw Role is required error when try to create an user without role', async (done) => {
+  it('Should throw Role is required error when try to create an user without role', async done => {
     await request(app)
       .post('/api/users')
       .send({
@@ -188,7 +185,7 @@ describe('User API', () => {
       .set('Authorization', `Bearer ${admin.token}`)
       .set('Accept', 'application/json')
       .expect(422)
-      .then((response) => {
+      .then(response => {
         expect(response.body).toBeDefined();
         expect(response.body.errors).toBeDefined();
         expect(response.body.errors).toHaveLength(1);

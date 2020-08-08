@@ -6,11 +6,13 @@ const factoryRoutes = ({ middleware, appError, auth }) => {
   const factoryController = FactoryController({ middleware, appError, auth });
   router.param('id', factoryController.params);
 
-  router.route('/')
+  router
+    .route('/')
     .get(factoryController.list)
     .post(factoryValidator.validateCreateOrUpdate, factoryController.create);
 
-  router.route('/:id')
+  router
+    .route('/:id')
     .get(factoryController.read)
     .put(factoryValidator.validateCreateOrUpdate, factoryController.update)
     .delete(factoryController.delete);

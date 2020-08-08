@@ -14,11 +14,11 @@ describe('Authentication API', () => {
     await setup.init();
   });
 
-  afterAll((done) => {
+  afterAll(done => {
     setup.close(done);
   });
 
-  it('Should signin', async (done) => {
+  it('Should signin', async done => {
     const user = {
       username: 'username_auth_001',
       password: 'pass',
@@ -34,7 +34,7 @@ describe('Authentication API', () => {
       .send(user)
       .set('Accept', 'application/json')
       .expect(200)
-      .then((response) => {
+      .then(response => {
         const loggedUser = response.body;
         expect(loggedUser).toBeDefined();
         expect(loggedUser._id).toEqual(createdUser._id);
@@ -45,31 +45,29 @@ describe('Authentication API', () => {
       });
   });
 
-  it('Should not signin and receive invalid username and/or password', async (done) => {
+  it('Should not signin and receive invalid username and/or password', async done => {
     const user = {
       username: 'username_auth_002',
       password: 'pass',
       role: 'user',
     };
-    await modelUtil.create(
-      request(app),
-      user,
-      modelUtil.apiPaths.users,
-    );
+    await modelUtil.create(request(app), user, modelUtil.apiPaths.users);
     user.password = 'wrongPass';
     await request(app)
       .post('/auth/signin')
       .send(user)
       .set('Accept', 'application/json')
       .expect(401)
-      .then((response) => {
+      .then(response => {
         expect(response.body).toBeDefined();
-        expect(response.body).toEqual({ error: 'Invalid username and/or password' });
+        expect(response.body).toEqual({
+          error: 'Invalid username and/or password',
+        });
         done();
       });
   });
 
-  it('Should receive the error message \'you need an username and password\'', async (done) => {
+  it("Should receive the error message 'you need an username and password'", async done => {
     const user = {
       username: 'username_auth_003',
       password: null,
@@ -80,14 +78,16 @@ describe('Authentication API', () => {
       .send(user)
       .set('Accept', 'application/json')
       .expect(400)
-      .then((response) => {
+      .then(response => {
         expect(response.body).toBeDefined();
-        expect(response.body).toEqual({ error: 'You need an username and password' });
+        expect(response.body).toEqual({
+          error: 'You need an username and password',
+        });
         done();
       });
   });
 
-  it('Should always validate the token', async (done) => {
+  it('Should always validate the token', async done => {
     const user = {
       username: 'username_auth_004',
       password: 'pass',
@@ -103,7 +103,7 @@ describe('Authentication API', () => {
       .set('Accept', 'application/json')
       .query({ access_token: createdUser.token })
       .expect(200)
-      .then((response) => {
+      .then(response => {
         const me = response.body;
         expect(me).toBeDefined();
         expect(me._id).toEqual(createdUser._id);
@@ -112,7 +112,7 @@ describe('Authentication API', () => {
       });
   });
 
-  it('Should return Invalid id when try to access with a deleted user', async (done) => {
+  it('Should return Invalid id when try to access with a deleted user', async done => {
     const user = {
       username: 'username_auth_005',
       password: 'pass',
@@ -134,7 +134,7 @@ describe('Authentication API', () => {
       .set('Accept', 'application/json')
       .query({ access_token: createdUser.token })
       .expect(403)
-      .then((response) => {
+      .then(response => {
         expect(response.body).toBeDefined();
         expect(response.body.error).toBeDefined();
         expect(response.body.error.message).toEqual('Invalid id');

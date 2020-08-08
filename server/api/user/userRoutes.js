@@ -8,11 +8,13 @@ const userRoutes = ({ middleware, appError, auth }) => {
   router.param('id', userController.params);
   router.get('/me', userController.me);
 
-  router.route('/')
+  router
+    .route('/')
     .get(userController.list)
     .post(userValidator.validateCreateOrUpdate, userController.create);
 
-  router.route('/:id')
+  router
+    .route('/:id')
     .get(userController.read)
     .put(userController.update)
     .delete(userController.delete);

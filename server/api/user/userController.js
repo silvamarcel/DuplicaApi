@@ -14,7 +14,7 @@ const userController = ({ middleware, appError, auth }) => {
     await User.findById(id)
       .select('-password -__v')
       .exec()
-      .then((user) => {
+      .then(user => {
         if (!user) {
           return next(appError.buildError(null, 403, 'Invalid id'));
         }
@@ -35,15 +35,15 @@ const userController = ({ middleware, appError, auth }) => {
       .catch(appError.catchError(next));
   };
 
-
-  const buildSavedUser = (savedUser) => {
+  const buildSavedUser = savedUser => {
     const user = _.pick(savedUser, ['_id', 'username', 'role']);
     const token = auth.signToken(user);
     return _.assign(user, { token });
   };
 
   const save = async (user, res, next) => {
-    await user.save()
+    await user
+      .save()
       .then(savedUser => res.json(buildSavedUser(savedUser)))
       .catch(appError.catchError(next, 'Username already exists.'));
   };
@@ -53,9 +53,8 @@ const userController = ({ middleware, appError, auth }) => {
     await save(new User(req.body), res, next);
   };
 
-  const createManagerUser = async (data) => {
-    await (new User(data)).save()
-      .then(savedUser => buildSavedUser(savedUser));
+  const createManagerUser = async data => {
+    await new User(data).save().then(savedUser => buildSavedUser(savedUser));
   };
 
   const read = async (req, res, next) => {
@@ -75,7 +74,8 @@ const userController = ({ middleware, appError, auth }) => {
   };
 
   const deleteUser = async (req, res, next) => {
-    await req.userModel.remove()
+    await req.userModel
+      .remove()
       .then(removedUser => res.json(removedUser))
       .catch(appError.catchError(next));
   };

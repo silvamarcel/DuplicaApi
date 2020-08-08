@@ -38,10 +38,10 @@ describe('Authentication API', () => {
     let text = null;
     const req = { user };
     const res = {
-      status: (s) => {
+      status: s => {
         status = s;
         return {
-          send: (t) => {
+          send: t => {
             text = t;
           },
         };

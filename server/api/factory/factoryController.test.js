@@ -28,7 +28,7 @@ describe('Factory Controller API', () => {
     castError.name = 'CastError';
     mockingoose.factories.toReturn(castError, 'findOne');
 
-    next = (error) => {
+    next = error => {
       expect(error).toBeDefined();
       expect(error.name).toEqual('APIError');
       expect(error.status).toEqual(403);
@@ -44,7 +44,7 @@ describe('Factory Controller API', () => {
     genericError.name = 'Error';
     mockingoose.factories.toReturn(genericError, 'findOne');
 
-    next = (error) => {
+    next = error => {
       expect(error).toBeDefined();
       expect(error).toEqual(genericError);
     };
@@ -62,7 +62,7 @@ describe('Factory Controller API', () => {
   it('Should return Factory not found when user is not defined', async () => {
     req = { factory: undefined };
     res = { json: jest.fn() };
-    next = (error) => {
+    next = error => {
       expect(error).toBeDefined();
       expect(error.name).toEqual('APIError');
       expect(error.status).toEqual(404);
@@ -91,7 +91,7 @@ describe('Factory Controller API', () => {
         contract: 'myContract',
       },
     };
-    next = (error) => {
+    next = error => {
       expect(error).toBeDefined();
       expect(error).toEqual(genericError);
     };

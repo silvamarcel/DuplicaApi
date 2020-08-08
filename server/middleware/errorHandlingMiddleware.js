@@ -21,7 +21,11 @@ const verifyMongoDBErrors = ({ logger, err }) => {
       case 11000:
         throw buildError(logger, 403, err.message);
       default:
-        throw buildError(logger, 500, `Unknown error or not mapped: ${err.message}`);
+        throw buildError(
+          logger,
+          500,
+          `Unknown error or not mapped: ${err.message}`,
+        );
     }
   }
 };

@@ -63,7 +63,7 @@ const init = async () => {
   await createUserManager();
 };
 
-const close = async (done) => {
+const close = async done => {
   logger.info('Closing the DB connection...');
   await dbTest.disconnect();
   logger.info('DB connection closed.');

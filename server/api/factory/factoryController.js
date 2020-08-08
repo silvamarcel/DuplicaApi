@@ -13,7 +13,7 @@ const factoryController = ({ middleware, appError }) => {
     await Factory.findById(id)
       .select('-__v')
       .exec()
-      .then((factory) => {
+      .then(factory => {
         if (!factory) {
           return next(appError.buildError(null, 403, 'Invalid id'));
         }
@@ -32,8 +32,9 @@ const factoryController = ({ middleware, appError }) => {
   };
 
   const save = async (factoryModel, res, next) => {
-    await factoryModel.save()
-      .then((savedFactory) => {
+    await factoryModel
+      .save()
+      .then(savedFactory => {
         const factory = _.pick(savedFactory, [
           '_id',
           'businessId',
@@ -44,7 +45,9 @@ const factoryController = ({ middleware, appError }) => {
         ]);
         return res.json(factory);
       })
-      .catch(appError.catchError(next, 'A factory with this name already exists.'));
+      .catch(
+        appError.catchError(next, 'A factory with this name already exists.'),
+      );
   };
 
   const create = async (req, res, next) => {
@@ -69,7 +72,8 @@ const factoryController = ({ middleware, appError }) => {
   };
 
   const deleteFactory = async (req, res, next) => {
-    await req.factory.remove()
+    await req.factory
+      .remove()
       .then(removedFactory => res.json(removedFactory))
       .catch(appError.catchError(next));
   };

@@ -26,11 +26,13 @@
         "resource": "users/*",
         "methods": ["POST", "GET", "PUT", "DELETE"],
         "action": "deny",
-        "subRoutes": [{
-          "resource": "me",
-          "methods": ["GET"],
-          "action": "allow"
-        }]
+        "subRoutes": [
+          {
+            "resource": "me",
+            "methods": ["GET"],
+            "action": "allow"
+          }
+        ]
       },
       {
         "resource": "factories/*",

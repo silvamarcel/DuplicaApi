@@ -29,7 +29,7 @@ describe('User Controller API', () => {
     castError.name = 'CastError';
     mockingoose.users.toReturn(castError, 'findOne');
 
-    next = (error) => {
+    next = error => {
       expect(error).toBeDefined();
       expect(error.name).toEqual('APIError');
       expect(error.status).toEqual(403);
@@ -45,7 +45,7 @@ describe('User Controller API', () => {
     genericError.name = 'Error';
     mockingoose.users.toReturn(genericError, 'findOne');
 
-    next = (error) => {
+    next = error => {
       expect(error).toBeDefined();
       expect(error).toEqual(genericError);
     };
@@ -63,7 +63,7 @@ describe('User Controller API', () => {
   it('Should return User not found when user is not defined', async () => {
     req = { userModel: undefined };
     res = { json: jest.fn() };
-    next = (error) => {
+    next = error => {
       expect(error).toBeDefined();
       expect(error.name).toEqual('APIError');
       expect(error.status).toEqual(404);
@@ -91,7 +91,7 @@ describe('User Controller API', () => {
     req = {
       body: { username: 'myUsername', password: 'myPassword', role: 'myRole' },
     };
-    next = (error) => {
+    next = error => {
       expect(error).toBeDefined();
       expect(error).toEqual(genericError);
     };
