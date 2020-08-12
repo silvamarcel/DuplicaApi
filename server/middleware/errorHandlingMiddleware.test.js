@@ -1,8 +1,9 @@
 const { initConfig } = require('../../tests/setup');
 
 const logger = require('../log/logger')({ config: initConfig() });
+const errors = require('../errors')({ logger });
 const errorHandlingMiddleware = require('./errorHandlingMiddleware')({
-  logger,
+  errors,
 });
 const response = require('../../tests/utils/response.mock');
 

@@ -1,7 +1,10 @@
 module.exports = {
   verbose: true,
   testEnvironment: 'node',
-  unmockedModulePathPatterns: ['./node_modules/lodash'],
+  unmockedModulePathPatterns: [
+    './node_modules/lodash',
+    './node_modules/mongoose',
+  ],
   coverageDirectory: 'coverage',
   coverageThreshold: {
     global: {

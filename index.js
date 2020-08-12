@@ -1,12 +1,14 @@
 const config = require('./server/config/config');
+const Errors = require('./server/errors');
 const Store = require('./server/store');
 const Logger = require('./server/log/logger');
 const Middleware = require('./server/middleware');
 const App = require('./server/server');
 
 const logger = Logger({ config });
+const errors = Errors({ logger });
 const store = Store({ config, logger });
-const middleware = Middleware({ config, logger });
+const middleware = Middleware({ config, errors });
 const { listen } = App({ store, middleware });
 
 // Start the connection with the DB

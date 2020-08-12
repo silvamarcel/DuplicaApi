@@ -3,14 +3,6 @@
   "version": "1.0.0",
   "description": "Duplica API",
   "main": "index.js",
-  "jest": {
-    "verbose": true,
-    "testEnvironment": "node",
-    "unmockedModulePathPatterns": [
-      "./node_modules/lodash",
-      "./node_modules/mongoose"
-    ]
-  },
   "scripts": {
     "lint": "eslint server/** tests/**",
     "test": "jest --detectOpenHandles --forceExit --runInBand server",
