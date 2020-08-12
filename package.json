@@ -14,8 +14,8 @@
   "scripts": {
     "lint": "eslint server/** tests/**",
     "test": "jest --detectOpenHandles --forceExit --runInBand server",
-    "test:auto": "jest --detectOpenHandles --watch --runInBand --forceExit server",
-    "coverage": "jest --collectCoverageFrom=server/**/*.js --collectCoverageFrom=!server/utils/logger.js --collectCoverageFrom=!server/middleware/appMiddleware.js --coverage --runInBand --forceExit server",
+    "test:auto": "jest --watch --detectOpenHandles --runInBand --forceExit server",
+    "coverage": "jest --coverage --detectOpenHandles --runInBand --forceExit server",
     "start": "node index.js",
     "start:dev": "nodemon index.js"
   },
