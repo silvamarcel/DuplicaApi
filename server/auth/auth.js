@@ -5,7 +5,12 @@ const config = require('../config/config');
 const appError = require('../error');
 const User = require('../api/user/userModel');
 
-const checkToken = expressJwt({ secret: config.secrets.jwt });
+const { secrets, expireTime } = config;
+
+const checkToken = expressJwt({
+  secret: secrets.jwt,
+  algorithms: ['HS256'],
+});
 
 const decodeToken = () => (req, res, next) => {
   if (
@@ -18,8 +23,8 @@ const decodeToken = () => (req, res, next) => {
 };
 
 const signToken = ({ _id, username, role }) =>
-  jwt.sign({ _id, username, role }, config.secrets.jwt, {
-    expiresIn: config.expireTime,
+  jwt.sign({ _id, username, role }, secrets.jwt, {
+    expiresIn: expireTime,
   });
 
 const goNext = (user, req, next) => {
