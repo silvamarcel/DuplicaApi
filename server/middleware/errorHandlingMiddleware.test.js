@@ -12,7 +12,7 @@ let res;
 let error;
 let next;
 
-describe('errorHandling.js', () => {
+describe('Error Handling Middleware', () => {
   beforeEach(() => {
     error = null;
     values = {
@@ -23,70 +23,9 @@ describe('errorHandling.js', () => {
     next = jest.fn();
   });
 
-  it('Should return 401 UnauthorizedError', () => {
-    error = { name: 'UnauthorizedError' };
-    errorHandlingMiddleware(error, null, res, next);
-    expect(values.status).toEqual(401);
-    expect(values.message).toEqual('Invalid token');
-  });
-
-  it('Should return MongoError 11000', () => {
-    error = {
-      code: 11000,
-      name: 'MongoError',
-      message: 'Any message',
-    };
-    errorHandlingMiddleware(error, null, res, next);
-    expect(values.status).toEqual(403);
-    expect(values.message).toEqual('Any message');
-  });
-
-  it('Should return an Unknown MongoError', () => {
-    error = {
-      code: null,
-      name: 'MongoError',
-      message: 'Any message',
-    };
-    errorHandlingMiddleware(error, null, res, next);
-    expect(values.status).toEqual(500);
-    expect(values.message).toEqual('Unknown error or not mapped: Any message');
-  });
-
-  it('Should return an APIError with status 402', () => {
-    error = {
-      status: 402,
-      name: 'APIError',
-      message: 'Any message',
-    };
-    errorHandlingMiddleware(error, null, res, next);
-    expect(values.status).toEqual(402);
-    expect(values.message).toEqual('Any message');
-  });
-
-  it('Should return an APIError with status 500 when no status are passed', () => {
-    error = {
-      name: 'APIError',
-      message: 'Any message',
-    };
-    errorHandlingMiddleware(error, null, res, next);
-    expect(values.status).toEqual(500);
-    expect(values.message).toEqual('Any message');
-  });
-
   it('Should not return an Error when err is null', () => {
     error = null;
     errorHandlingMiddleware(error, null, res, next);
     expect(next).toHaveBeenCalled();
-  });
-
-  it('Should return an Unknown Error', () => {
-    error = {
-      code: null,
-      name: 'UnknownError',
-      message: 'Unknown error',
-    };
-    errorHandlingMiddleware(error, null, res, next);
-    expect(values.status).toEqual(500);
-    expect(values.message).toEqual('Unknown error');
   });
 });
