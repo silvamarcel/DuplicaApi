@@ -18,6 +18,9 @@ class MongoDBError extends Errors {
           );
       }
     }
+    if (this.is(err, 'CastError')) {
+      throw this.buildError(403, 'Invalid id');
+    }
   }
 }
 

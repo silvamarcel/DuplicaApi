@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const models = require('./models');
 
 const Connect = (config, logger) => async () => {
   logger.info('Connecting to MongoDB...');
@@ -24,6 +25,7 @@ module.exports = ({ config, logger }) => {
 
   return {
     mongoose,
+    models,
     connect,
     disconnect,
   };

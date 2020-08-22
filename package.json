@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint server/** tests/**",
-    "test": "jest --detectOpenHandles --forceExit --runInBand server",
-    "test:auto": "jest --watch --detectOpenHandles --runInBand --forceExit server",
-    "coverage": "jest --coverage --detectOpenHandles --runInBand --forceExit server",
+    "test": "jest --detectOpenHandles --forceExit --runInBand server tests",
+    "test:auto": "jest --watch --detectOpenHandles --runInBand --forceExit server tests",
+    "coverage": "jest --coverage --detectOpenHandles --runInBand --forceExit server tests",
     "start": "node index.js",
     "start:dev": "nodemon index.js"
   },
@@ -28,7 +28,6 @@
     "method-override": "^3.0.0",
     "mongoose": "^5.9.28",
     "morgan": "^1.10.0",
-    "ramda": "^0.27.1",
     "winston": "^3.3.3"
   },
   "devDependencies": {

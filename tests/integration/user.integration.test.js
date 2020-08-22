@@ -1,10 +1,5 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
-const {
-  setup,
-  modelUtil,
-  request,
-  app,
-} = require('../../../tests/integrationTestsSetup');
+const { setup, modelUtil, request, app } = require('../integrationTestsSetup');
 
 let admin;
 
@@ -92,7 +87,7 @@ describe('User API', () => {
     const updatedUsername = 'testUsername005updated';
     await request(app)
       .put(`/api/users/${createdUser._id}`)
-      .send({ username: updatedUsername })
+      .send({ username: updatedUsername, role: 'user' })
       .set('Accept', 'application/json')
       .set('Authorization', `Bearer ${createdUser.token}`)
       .expect(200)

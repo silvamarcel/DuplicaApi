@@ -1,32 +1,39 @@
 const config = require('../server/config/config');
-const appError = require('../server/error');
-const auth = require('../server/auth');
-const logger = require('../server/log/logger')({ config });
-const errors = require('../server/errors')({ logger });
-const dbTest = require('../server/store')({ config, logger });
-const middleware = require('../server/middleware')({ config, errors });
-const UserController = require('../server/api/user/userController');
+const Errors = require('../server/errors');
+const Store = require('../server/store');
+const Logger = require('../server/log/logger');
+const Middleware = require('../server/middleware');
+const Services = require('../server/services');
+const Controllers = require('../server/controllers');
 const seeds = require('./seeds');
 const request = require('./request');
+
+const logger = Logger({ config });
+const errors = Errors({ logger });
+const store = Store({ config, logger });
+const middleware = Middleware({ store, config, errors });
+
+const services = Services({ store });
+const { userController } = Controllers({ middleware, services });
 
 const initConfig = () => {
   logger.info('Initializing config files for test...');
   process.env.NODE_ENV = 'test';
   config.init();
-  dbTest.mongoose.set('bufferCommands', false);
-  // dbTest.mongoose.set('debug', config.mongooseDebug);
+  store.mongoose.set('bufferCommands', false);
+  // store.mongoose.set('debug', config.mongooseDebug);
   logger.info('Config files for test initialized.');
   return config;
 };
 
 const initModels = async () => {
   logger.info('Initializing models for test...');
-  const models = dbTest.mongoose.modelNames();
+  const models = store.mongoose.modelNames();
   if (models) {
     const results = [];
     for (let i = 0; i < models.length; i += 1) {
       const model = models[i];
-      results.push(dbTest.mongoose.models[model].ensureIndexes());
+      results.push(store.mongoose.models[model].ensureIndexes());
     }
     await Promise.all(results);
   }
@@ -34,7 +41,6 @@ const initModels = async () => {
 };
 
 const createUserManager = async () => {
-  const userController = UserController({ middleware, appError, auth });
   logger.info('Creating user manager...');
   await userController.createManagerUser({
     username: config.userManager,
@@ -46,13 +52,13 @@ const createUserManager = async () => {
 
 const startDB = async () => {
   logger.info('Starting the DB connection...');
-  await dbTest.connect();
+  await store.connect();
   logger.info('DB connection started.');
 };
 
 const cleanDB = async () => {
   logger.info('Cleaning the DB ...');
-  await dbTest.mongoose.connection.dropDatabase();
+  await store.mongoose.connection.dropDatabase();
   logger.info('DB cleaned');
 };
 
@@ -66,7 +72,7 @@ const init = async () => {
 
 const close = async done => {
   logger.info('Closing the DB connection...');
-  await dbTest.disconnect();
+  await store.disconnect();
   logger.info('DB connection closed.');
   done();
 };

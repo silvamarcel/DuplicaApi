@@ -1,7 +1,13 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id", "_doc"] }] */
 const mockingoose = require('mockingoose').default;
-require('../api/user/userModel');
-const auth = require('./auth');
+const config = require('../../config/config');
+const Store = require('../../store');
+const Logger = require('../../log/logger');
+const Auth = require('./auth');
+
+const logger = Logger({ config });
+const store = Store({ config, logger });
+const auth = Auth({ store, config });
 
 describe('Authentication API', () => {
   beforeEach(() => {

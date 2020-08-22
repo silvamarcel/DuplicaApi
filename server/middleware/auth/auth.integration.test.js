@@ -4,7 +4,7 @@ const {
   modelUtil,
   request,
   app,
-} = require('../../tests/integrationTestsSetup');
+} = require('../../../tests/integrationTestsSetup');
 
 describe('Authentication API', () => {
   beforeAll(async () => {

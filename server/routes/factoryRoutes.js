@@ -1,9 +1,9 @@
 const router = require('express').Router();
-const FactoryController = require('./factoryController');
-const factoryValidator = require('./factoryValidator');
 
-const factoryRoutes = ({ middleware, appError, auth }) => {
-  const factoryController = FactoryController({ middleware, appError, auth });
+const factoryRoutes = ({ validators, controllers }) => {
+  const { factoryController } = controllers;
+  const { factoryValidator } = validators;
+
   router.param('id', factoryController.params);
 
   router

@@ -1,10 +1,5 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
-const {
-  setup,
-  modelUtil,
-  request,
-  app,
-} = require('../../../tests/integrationTestsSetup');
+const { setup, modelUtil, request, app } = require('../integrationTestsSetup');
 
 const { factorySeed } = setup.seeds;
 const { get, put, remove, post } = setup.request;
@@ -132,7 +127,7 @@ describe('Factory API', () => {
       });
   });
 
-  it('Should get an error when try to create the same factory more than once', async done => {
+  it('Should throw an error when try to create the same factory more than once', async done => {
     const factory = factorySeed.getNextFactory();
     await createFactory(factory);
     await post(app, '/api/factories', factory, loggedUser.token)
@@ -237,5 +232,18 @@ describe('Factory API', () => {
     )
       .expect(422)
       .then(validateFactoryInvalidZipCode(done));
+  });
+
+  it('Should throw APIError with status 403 and Invalid id when a CastError occurs', async done => {
+    const invalidId = 'myId';
+    await get(app, `/api/factories/${invalidId}`, loggedUser.token)
+      .expect(403)
+      .then(response => {
+        const { error } = response.body;
+        expect(error).toBeDefined();
+        expect(error.status).toEqual(403);
+        expect(error.message).toEqual('Invalid id');
+        done();
+      });
   });
 });
