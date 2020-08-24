@@ -1,7 +1,7 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 const { setup, modelUtil, request, app } = require('../integrationTestsSetup');
 
-const { factorySeed } = setup.seeds;
+const { factorySeed, userSeed } = setup.seeds;
 const { get, put, remove, post } = setup.request;
 
 let loggedUser = null;
@@ -9,16 +9,19 @@ let loggedUser = null;
 const createFactory = factory =>
   modelUtil.create(request(app), factory, modelUtil.apiPaths.factories);
 
-const user = {
-  username: 'userForFactoryIntegrationTest',
-  password: 'pass',
-  role: 'user',
-};
+const user = userSeed.getNextUser();
 
 const validateFactory = (expectedFactory, factory) => {
   expect(expectedFactory.businessId).toEqual(factory.businessId);
   expect(expectedFactory.name).toEqual(factory.name);
   expect(expectedFactory.contract).toEqual(factory.contract);
+};
+
+const validateFactoryWithIdIncluded = (createdFactory, done) => response => {
+  const foundFactory = response.body;
+  expect(foundFactory._id).toEqual(createdFactory._id);
+  validateFactory(foundFactory, createdFactory);
+  done();
 };
 
 const validateFactoryField = field => response => {
@@ -41,13 +44,6 @@ const validateFactoryInvalidZipCode = done => response => {
   expect(response.body.errors[0].msg).toEqual(
     'Factory zipCode can only contains numbers',
   );
-  done();
-};
-
-const getResolve = (createdFactory, done) => response => {
-  const foundFactory = response.body;
-  expect(foundFactory._id).toEqual(createdFactory._id);
-  validateFactory(foundFactory, createdFactory);
   done();
 };
 
@@ -92,7 +88,7 @@ describe('Factory API', () => {
     const createdFactory = await createFactory(factory);
     await get(app, `/api/factories/${createdFactory._id}`, loggedUser.token)
       .expect(200)
-      .then(getResolve(createdFactory, done));
+      .then(validateFactoryWithIdIncluded(createdFactory, done));
   });
 
   it('Should update a factory', async done => {
@@ -106,7 +102,12 @@ describe('Factory API', () => {
       loggedUser.token,
     )
       .expect(200)
-      .then(getResolve({ ...createdFactory, name: factory.name }, done));
+      .then(
+        validateFactoryWithIdIncluded(
+          { ...createdFactory, name: factory.name },
+          done,
+        ),
+      );
   });
 
   it('Should delete a factory', async done => {

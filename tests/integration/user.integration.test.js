@@ -1,10 +1,40 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
 const { setup, modelUtil, request, app } = require('../integrationTestsSetup');
 
+const { userSeed } = setup.seeds;
+const { get, put, remove, post } = setup.request;
+
 let admin;
 
 const createUser = user =>
   modelUtil.create(request(app), user, modelUtil.apiPaths.users);
+
+const validateUser = (expectedUser, user) => {
+  expect(expectedUser.password).toBeUndefined();
+  expect(expectedUser.username).toEqual(user.username);
+  expect(expectedUser.role).toEqual(user.role);
+};
+
+const validateUserWithIdIncluded = (expectedUser, user) => {
+  expect(expectedUser._id).toEqual(user._id);
+  validateUser(expectedUser, user);
+};
+
+const validateError = (response, message) => {
+  expect(response.body).toBeDefined();
+  expect(response.body.error).toBeDefined();
+  expect(response.body.error.message).toEqual(message);
+};
+
+const validateRequiredErrors = (response, location, field, value, message) => {
+  expect(response.body).toBeDefined();
+  expect(response.body.errors).toBeDefined();
+  expect(response.body.errors).toHaveLength(1);
+  expect(response.body.errors[0].location).toEqual(location);
+  expect(response.body.errors[0].param).toEqual(field);
+  expect(response.body.errors[0].value).toEqual(value);
+  expect(response.body.errors[0].msg).toEqual(message);
+};
 
 describe('User API', () => {
   beforeAll(async () => {
@@ -16,175 +46,147 @@ describe('User API', () => {
     setup.close(done);
   });
 
-  it('Should create an user', async () => {
-    const user = {
-      username: 'username_001',
-      password: 'pass',
-      role: 'user',
-    };
-    const createdUser = await createUser(user);
-    expect(createdUser.username).toEqual(user.username);
-    expect(createdUser.password).toBeUndefined();
-    expect(createdUser.token).toBeDefined();
-  });
-
-  it('Should find all users', async done => {
-    const user = {
-      username: 'username_002',
-      password: 'pass',
-      role: 'user',
-    };
-    const user2 = {
-      username: 'username_003',
-      password: 'pass',
-      role: 'user',
-    };
-    const createdUser = await createUser(user);
+  it('Should list users', async done => {
+    const user1 = userSeed.getNextUser();
+    const user2 = userSeed.getNextUser();
+    const createdUser1 = await createUser(user1);
     const createdUser2 = await createUser(user2);
-    await request(app)
-      .get('/api/users')
-      .set('Accept', 'application/json')
-      .set('Authorization', `Bearer ${admin.token}`)
+    await get(app, '/api/users', admin.token)
       .expect(200)
       .then(response => {
         const users = response.body;
-        expect(users).toBeDefined();
         expect(users.length).toBeGreaterThanOrEqual(2);
-        expect(createdUser.username).toEqual(user.username);
-        expect(createdUser2.username).toEqual(user2.username);
+        validateUser(createdUser1, user1);
+        validateUser(createdUser2, user2);
         done();
       });
   });
 
-  it('Should find an user', async done => {
-    const user = {
-      username: 'username_004',
-      password: 'pass',
-      role: 'admin',
-    };
+  it('Should create an user', async () => {
+    const user = userSeed.getNextUser();
     const createdUser = await createUser(user);
-    await request(app)
-      .get(`/api/users/${createdUser._id}`)
-      .set('Accept', 'application/json')
-      .set('Authorization', `Bearer ${createdUser.token}`)
+    validateUser(createdUser, user);
+  });
+
+  it('Should read an user', async done => {
+    const user = userSeed.getNextUser();
+    const createdUser = await createUser(user);
+    await get(app, `/api/users/${createdUser._id}`, admin.token)
       .expect(200)
       .then(response => {
         const foundUser = response.body;
-        expect(foundUser).toBeDefined();
-        expect(foundUser._id).toEqual(createdUser._id);
-        expect(foundUser.username).toEqual(createdUser.username);
+        validateUserWithIdIncluded(foundUser, createdUser);
         done();
       });
   });
 
   it('Should update an user', async done => {
-    const user = {
-      username: 'username_005',
-      password: 'pass',
-      role: 'admin',
-    };
+    const user = userSeed.getNextUser();
     const createdUser = await createUser(user);
-    const updatedUsername = 'testUsername005updated';
-    await request(app)
-      .put(`/api/users/${createdUser._id}`)
-      .send({ username: updatedUsername, role: 'user' })
-      .set('Accept', 'application/json')
-      .set('Authorization', `Bearer ${createdUser.token}`)
+    user.username = `${createdUser.username}_Updated`;
+    delete user.password;
+    await put(app, `/api/users/${createdUser._id}`, user, admin.token)
       .expect(200)
       .then(response => {
-        const foundUser = response.body;
-        expect(foundUser).toBeDefined();
-        expect(foundUser._id).toEqual(createdUser._id);
-        expect(foundUser.username).toEqual(updatedUsername);
+        const updatedUser = response.body;
+        validateUserWithIdIncluded(updatedUser, {
+          ...createdUser,
+          username: user.username,
+        });
+        done();
+      });
+  });
+
+  it('Should delete a user', async done => {
+    const user = userSeed.getNextUser();
+    const createdUser = await createUser(user);
+    await remove(app, `/api/users/${createdUser._id}`, admin.token).expect(200);
+    await get(app, `/api/users/${createdUser._id}`, admin.token)
+      .expect(403)
+      .then(response => {
+        validateError(response, 'Invalid id');
         done();
       });
   });
 
   it('Should find me', async done => {
-    const user = {
-      username: 'username_006',
-      password: 'pass',
-      role: 'user',
-    };
+    const user = userSeed.getNextUser();
     const createdUser = await createUser(user);
-    await request(app)
-      .get('/api/users/me')
-      .set('Accept', 'application/json')
-      .set('Authorization', `Bearer ${createdUser.token}`)
+    await get(app, '/api/users/me', createdUser.token)
       .expect(200)
       .then(response => {
         const me = response.body;
-        expect(me).toBeDefined();
-        expect(me._id).toEqual(createdUser._id);
-        expect(me.username).toEqual(createdUser.username);
+        validateUserWithIdIncluded(me, createdUser);
         done();
       });
   });
 
-  it('Should get an error when try to create the same user more than once', async done => {
-    const user = {
-      username: 'username_007',
-      password: 'pass',
-      role: 'admin',
-    };
+  it('Should throw Username already exists error when try to create the same username more than once', async done => {
+    const user = userSeed.getNextUser();
     await createUser(user);
-    await request(app)
-      .post('/api/users')
+    await post(app, '/api/users', user, admin.token)
       .send(user)
-      .set('Accept', 'application/json')
-      .set('Authorization', `Bearer ${admin.token}`)
       .expect(403)
       .then(response => {
-        expect(response.body).toBeDefined();
-        expect(response.body.error).toBeDefined();
-        expect(response.body.error.message).toEqual('Username already exists.');
+        validateError(response, 'Username already exists.');
+        done();
+      });
+  });
+
+  it('Should throw Username already exists error when try to update for a username that already exists', async done => {
+    const user1 = userSeed.getNextUser();
+    const user2 = userSeed.getNextUser();
+    await createUser(user1);
+    const createdUser = await createUser(user2);
+    user2.username = user1.username;
+    await put(app, `/api/users/${createdUser._id}`, user2, admin.token)
+      .expect(403)
+      .then(response => {
+        validateError(response, 'Username already exists.');
         done();
       });
   });
 
   it('Should throw Username is required error when try to create an user without username', async done => {
-    const username = '';
-    await request(app)
-      .post('/api/users')
-      .send({
-        username,
-        password: '12345',
-        role: 'user',
-      })
-      .set('Authorization', `Bearer ${admin.token}`)
-      .set('Accept', 'application/json')
+    const user = userSeed.getNextUser();
+    user.username = '';
+    await post(app, '/api/users', user, admin.token)
       .expect(422)
       .then(response => {
-        expect(response.body).toBeDefined();
-        expect(response.body.errors).toBeDefined();
-        expect(response.body.errors).toHaveLength(1);
-        expect(response.body.errors[0].location).toEqual('body');
-        expect(response.body.errors[0].param).toEqual('username');
-        expect(response.body.errors[0].value).toEqual('');
-        expect(response.body.errors[0].msg).toEqual('Username is required');
+        validateRequiredErrors(
+          response,
+          'body',
+          'username',
+          user.username,
+          'Username is required',
+        );
         done();
       });
   });
 
   it('Should throw Role is required error when try to create an user without role', async done => {
-    await request(app)
-      .post('/api/users')
-      .send({
-        username: 'username_008',
-        password: '12345',
-        role: '',
-      })
-      .set('Authorization', `Bearer ${admin.token}`)
-      .set('Accept', 'application/json')
+    const user = userSeed.getNextUser();
+    user.role = '';
+    await post(app, '/api/users', user, admin.token)
       .expect(422)
       .then(response => {
-        expect(response.body).toBeDefined();
-        expect(response.body.errors).toBeDefined();
-        expect(response.body.errors).toHaveLength(1);
-        expect(response.body.errors[0].location).toEqual('body');
-        expect(response.body.errors[0].param).toEqual('role');
-        expect(response.body.errors[0].value).toEqual('');
-        expect(response.body.errors[0].msg).toEqual('Role is required');
+        validateRequiredErrors(
+          response,
+          'body',
+          'role',
+          user.role,
+          'Role is required',
+        );
+        done();
+      });
+  });
+
+  it('Should throw APIError with status 403 and Invalid id when a CastError occurs', async done => {
+    const invalidId = 'myId';
+    await get(app, `/api/users/${invalidId}`, admin.token)
+      .expect(403)
+      .then(response => {
+        validateError(response, 'Invalid id');
         done();
       });
   });

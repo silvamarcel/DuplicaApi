@@ -44,9 +44,9 @@ const userController = ({ middleware, services, appError }) => {
       .catch(err => next(err));
   };
 
-  const read = async (req, res, next) => {
+  const read = (req, res, next) => {
     if (!req.leanUser) {
-      await next(appError.buildError(null, 404, 'User not found!'));
+      return next(appError.buildError(null, 404, 'User not found!'));
     }
     return res.json(req.leanUser);
   };
