@@ -1,9 +1,9 @@
 /* eslint no-param-reassign: ["error", { "props": false }] */
 module.exports = expectedValues => ({
-  status: (status) => {
+  status: status => {
     expectedValues.status = status;
   },
-  json: (message) => {
+  json: message => {
     expectedValues.message = message.error.message;
   },
 });

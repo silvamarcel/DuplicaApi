@@ -15,7 +15,7 @@ const buildError = (err, status, message) => {
   return error;
 };
 
-const catchError = (next, message, errorCheck) => (err) => {
+const catchError = (next, message, errorCheck) => err => {
   let error = err;
   if (error && error.name === 'CastError') {
     error = buildError(error, 403, 'Invalid id');

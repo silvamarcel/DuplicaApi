@@ -3,54 +3,63 @@
   "version": "1.0.0",
   "description": "Duplica API",
   "main": "index.js",
-  "jest": {
-    "verbose": true,
-    "testEnvironment": "node",
-    "unmockedModulePathPatterns": [
-      "./node_modules/lodash",
-      "./node_modules/mongoose"
-    ]
-  },
   "scripts": {
     "lint": "eslint server/** tests/**",
-    "test": "jest --detectOpenHandles --forceExit --runInBand server",
-    "test:auto": "jest --detectOpenHandles --watch --runInBand --forceExit server",
-    "coverage": "jest --collectCoverageFrom=server/**/*.js --collectCoverageFrom=!server/utils/logger.js --collectCoverageFrom=!server/middleware/appMiddleware.js --coverage --runInBand --forceExit server",
+    "test": "jest --detectOpenHandles --forceExit --runInBand server tests",
+    "test:auto": "jest --watch --detectOpenHandles --runInBand --forceExit server tests",
+    "coverage": "jest --coverage --detectOpenHandles --runInBand --forceExit server tests",
     "start": "node index.js",
-    "start:dev": "nodemon"
+    "start:dev": "nodemon index.js"
   },
   "author": "Marcel Silva",
   "license": "MIT",
   "dependencies": {
-    "bcrypt": "^3.0.8",
+    "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-acl": "^2.0.8",
-    "express-jwt": "^5.3.3",
-    "express-validator": "^6.4.0",
-    "helmet": "^3.22.0",
+    "express-jwt": "^6.0.0",
+    "express-validator": "^6.6.1",
+    "helmet": "^3.23.3",
     "jsonwebtoken": "^8.5.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "method-override": "^3.0.0",
-    "mongoose": "^5.9.14",
+    "mongoose": "^5.9.28",
     "morgan": "^1.10.0",
-    "winston": "^3.2.1"
+    "winston": "^3.3.3"
   },
   "devDependencies": {
-    "@babel/cli": "^7.8.4",
-    "@babel/core": "^7.9.6",
-    "@babel/plugin-transform-runtime": "^7.9.6",
-    "@babel/polyfill": "^7.8.7",
-    "@babel/preset-env": "^7.9.6",
-    "@babel/runtime": "^7.9.6",
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.11.1",
+    "@babel/plugin-transform-runtime": "^7.11.0",
+    "@babel/polyfill": "^7.10.4",
+    "@babel/preset-env": "^7.11.0",
+    "@babel/runtime": "^7.11.2",
     "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.2.0",
-    "eslint-plugin-import": "^2.20.2",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-import": "^2.22.0",
     "eslint-plugin-jest": "^22.21.0",
-    "jest": "^26.0.1",
+    "eslint-plugin-prettier": "^3.1.4",
+    "husky": "^4.2.5",
+    "jest": "^26.3.0",
     "mockingoose": "^2.13.2",
-    "superagent": "^5.2.2",
+    "nodemon": "^2.0.4",
+    "prettier": "^2.0.5",
+    "pretty-quick": "^2.0.1",
+    "superagent": "^5.3.1",
     "supertest": "^4.0.2"
+  },
+  "engines": {
+    "node": ">=14",
+    "npm": ">=6.14.0"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run coverage && npm run lint && pretty-quick --staged",
+      "pre-push": "npm run lint"
+    }
   }
 }

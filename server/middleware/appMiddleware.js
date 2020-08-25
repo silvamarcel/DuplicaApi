@@ -9,14 +9,18 @@ const testing = config => config.env === 'testing';
 const middlewares = [];
 
 const addMorgan = () => {
-  middlewares.push(morgan('combined', {
-    skip: (req, res) => res.statusCode < 400,
-    stream: process.stderr,
-  }));
-  middlewares.push(morgan('combined', {
-    skip: (req, res) => res.statusCode >= 400,
-    stream: process.stdout,
-  }));
+  middlewares.push(
+    morgan('combined', {
+      skip: (req, res) => res.statusCode < 400,
+      stream: process.stderr,
+    }),
+  );
+  middlewares.push(
+    morgan('combined', {
+      skip: (req, res) => res.statusCode >= 400,
+      stream: process.stdout,
+    }),
+  );
 };
 
 const addHelmet = () => {

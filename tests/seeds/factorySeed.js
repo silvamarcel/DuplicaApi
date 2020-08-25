@@ -12,5 +12,4 @@ const factorySeed = ({ getSeed, getNextAddress, getNextContact }) => {
   };
 };
 
-
 module.exports = factorySeed;

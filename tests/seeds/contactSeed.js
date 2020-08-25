@@ -9,5 +9,4 @@ const contactSeed = ({ getSeed }) => {
   };
 };
 
-
 module.exports = contactSeed;

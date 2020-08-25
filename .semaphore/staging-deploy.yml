@@ -13,8 +13,8 @@ blocks:
       prologue:
         commands:
           - checkout --use-cache
-          - nvm install 12.3.1
-          - sem-version node 12.3.1
+          - nvm install 14.7.0
+          - sem-version node 14.7.0
           - cache restore
       jobs:
         - name: 'Deploying to Heroku'

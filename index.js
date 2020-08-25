@@ -1,17 +1,20 @@
 const config = require('./server/config/config');
-const Database = require('./server/store/database');
+const Errors = require('./server/errors');
+const Store = require('./server/store');
 const Logger = require('./server/log/logger');
 const Middleware = require('./server/middleware');
-const appError = require('./server/error');
 const App = require('./server/server');
 
-const database = Database({ config });
 const logger = Logger({ config });
-const middleware = Middleware({ config, logger });
-const app = App({ middleware, appError });
+const errors = Errors({ logger });
+const store = Store({ config, logger });
+const middleware = Middleware({ store, config, errors });
+const { listen } = App({ store, middleware });
 
+// TODO Improve this to make use of a list of services which need to be started
 // Start the connection with the DB
-database.connect();
+store.connect();
 
-app.listen(config.port);
-logger.info('Listening on', config.env, config.port);
+const { port, env } = config;
+listen(port);
+logger.info('Listening on', env, port);
