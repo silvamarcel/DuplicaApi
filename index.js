@@ -9,12 +9,12 @@ const logger = Logger({ config });
 const errors = Errors({ logger });
 const store = Store({ config, logger });
 const middleware = Middleware({ store, config, errors });
-const { listen } = App({ store, middleware });
+const server = App({ store, middleware });
 
 // TODO Improve this to make use of a list of services which need to be started
 // Start the connection with the DB
 store.connect();
 
 const { port, env } = config;
-listen(port);
-logger.info('Listening on', env, port);
+server.listen(port);
+logger.info(`Listening ${env} on port ${port}`);
