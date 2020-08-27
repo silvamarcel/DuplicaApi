@@ -16,6 +16,7 @@ module.exports = {
   },
   collectCoverageFrom: ['server/**/*.js', 'src/**/*.js'],
   coveragePathIgnorePatterns: [
+    'server/health.js',
     'server/log/logger.js',
     'server/store/database.js',
     'server/middleware/appMiddleware.js',

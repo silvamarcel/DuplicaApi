@@ -1,5 +1,6 @@
 const express = require('express');
 
+const health = require('./health');
 const api = require('./api');
 
 const server = ({ store, middleware }) => {
@@ -9,6 +10,9 @@ const server = ({ store, middleware }) => {
 
   // Setup the app's middlewares
   app.use(middleware.appMiddleware());
+
+  // Setup of the health routes
+  app.use('/', health());
 
   // Setup of the authentication routes
   app.use('/auth/', auth.authRoutes);
