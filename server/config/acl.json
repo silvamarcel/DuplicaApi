@@ -38,6 +38,11 @@
         "resource": "factories/*",
         "methods": ["POST", "GET", "PUT", "DELETE"],
         "action": "allow"
+      },
+      {
+        "resource": "companies/*",
+        "methods": ["POST", "GET", "PUT", "DELETE"],
+        "action": "allow"
       }
     ]
   }

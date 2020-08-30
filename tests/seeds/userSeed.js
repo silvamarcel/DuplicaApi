@@ -1,15 +1,21 @@
 const userSeed = ({ getSeed }) => {
-  const getNextUser = () => ({
-    username: `username_${getSeed()}`,
-    password: `pass_${getSeed()}`,
-    role: 'user',
-  });
+  const getNextUser = () => {
+    const seed = `${getSeed()}`;
+    return {
+      username: `username_${seed}`,
+      password: `pass_${seed}`,
+      role: 'user',
+    };
+  };
 
-  const getNextAdmin = () => ({
-    username: `username_${getSeed()}`,
-    password: `pass_${getSeed()}`,
-    role: 'admin',
-  });
+  const getNextAdmin = () => {
+    const seed = `${getSeed()}`;
+    return {
+      username: `username_${seed}`,
+      password: `pass_${seed}`,
+      role: 'admin',
+    };
+  };
 
   return {
     getNextUser,

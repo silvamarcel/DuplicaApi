@@ -1,11 +1,14 @@
 const factorySeed = ({ getSeed, getNextAddress, getNextContact }) => {
-  const getNextFactory = () => ({
-    businessId: `BusinessId_${getSeed()}`,
-    name: `FactoryName_${getSeed()}`,
-    contract: `Contract_${getSeed()}`,
-    address: getNextAddress(),
-    contact: getNextContact(),
-  });
+  const getNextFactory = () => {
+    const seed = `${getSeed()}`;
+    return {
+      businessId: `BusinessId_${seed}`,
+      name: `FactoryName_${seed}`,
+      contract: `Contract_${seed}`,
+      address: getNextAddress(),
+      contact: getNextContact(),
+    };
+  };
 
   return {
     getNextFactory,

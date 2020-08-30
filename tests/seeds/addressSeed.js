@@ -1,12 +1,15 @@
 const addressSeed = ({ getSeed }) => {
-  const getNextAddress = () => ({
-    zipCode: getSeed(),
-    address: `Address_${getSeed()}`,
-    complement: `Complement_${getSeed()}`,
-    neighborhood: `Neighbourhood_${getSeed()}`,
-    city: `City_${getSeed()}`,
-    state: `State_${getSeed()}`,
-  });
+  const getNextAddress = () => {
+    const seed = `${getSeed()}`;
+    return {
+      zipCode: seed,
+      address: `Address_${seed}`,
+      complement: `Complement_${seed}`,
+      neighborhood: `Neighbourhood_${seed}`,
+      city: `City_${seed}`,
+      state: `State_${seed}`,
+    };
+  };
 
   return {
     getNextAddress,
