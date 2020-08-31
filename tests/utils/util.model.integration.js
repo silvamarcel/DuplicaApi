@@ -5,6 +5,7 @@ const { userManager, passManager } = config;
 const apiPaths = {
   login: '/auth/signin',
   users: '/api/users',
+  companies: '/api/companies',
   factories: '/api/factories',
 };
 
