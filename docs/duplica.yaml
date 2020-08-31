@@ -60,7 +60,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Error'
+            $ref: '#/components/schemas/ExpressValidatorError'
     InternalServerError:
       description: Internal Server Error
       content:
@@ -97,4 +97,20 @@ components:
           type: integer
           format: int32
         message:
+          type: string
+    ExpressValidatorError:
+      type: object
+      required:
+        - msg
+        - param
+        - value
+        - location
+      properties:
+        msg:
+          type: string
+        param:
+          type: string
+        value:
+          type: string
+        location:
           type: string
