@@ -114,3 +114,7 @@ components:
           type: string
         location:
           type: string
+        nestedErrors:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExpressValidatorError'
