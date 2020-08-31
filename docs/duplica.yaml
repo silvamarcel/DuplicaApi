@@ -15,11 +15,8 @@ paths:
         '200':
           $ref: '#/components/responses/ListOfUsers'
         default:
-          description: Unexpected error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error'
+          $ref: '#/components/responses/UnexpectedError'
+          
 components:
   responses:
     ListOfUsers:
@@ -30,6 +27,12 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/User'
+    UnexpectedError:
+      description: Unexpected error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
     User:
       type: object
