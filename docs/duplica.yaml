@@ -1,16 +1,47 @@
 openapi: 3.0.0
+
 info:
   version: 1.0.0
   title: DuplicaAPI
+
 servers:
   - url: 'http://localhost:3000'
+  - url: 'https://staging-duplica-api.herokuapp.com/'
+
+tags:
+  - name: Authentication
+    description: Authentication endpoints
+  - name: Users
+    description: Users endpoints
+
 paths:
-  /users:
-    get:
-      summary: 'List the users of the system'
-      operationId: listUsers
+  /auth/signin:
+    post:
       tags:
-        - user
+        - Authentication
+      summary: 'Does the users login'
+      operationId: login
+      description: 'Does the users login'
+      requestBody:
+        $ref: '#/components/requestBodies/Login'
+      responses:
+        '200':
+          $ref: '#/components/responses/AuthenticatedUser'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/users:
+    get:
+      tags:
+        - Users
+      summary: 'List the users of the system ordered by name'
+      operationId: listUsers
+      description: 'List the users of the system ordered by name'
       responses:
         '200':
           $ref: '#/components/responses/ListOfUsers'
@@ -26,8 +57,122 @@ paths:
           $ref: '#/components/responses/InternalServerError'
         default:
           $ref: '#/components/responses/UnexpectedError'
-          
+    post:
+      tags:
+        - Users
+      summary: 'Creates an user'
+      operationId: createUser
+      description: 'Creates an user'
+      requestBody:
+        $ref: '#/components/requestBodies/UserBodyCreate'
+      responses:
+        '201':
+          $ref: '#/components/responses/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/users/me:
+    get:
+      tags:
+        - Users
+      summary: 'Gets the user by the JWT token'
+      operationId: me
+      description: 'Gets the user by the JWT token'
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+  /api/users/{id}:
+    get:
+      tags:
+        - Users
+      summary: 'Gets an user by `id`'
+      operationId: readUser
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    put:
+      tags:
+        - Users
+      summary: 'Update an user by `id`'
+      operationId: updateUser
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        $ref: '#/components/requestBodies/UserBody'
+      responses:
+        '200':
+          $ref: '#/components/responses/User'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+    delete:
+      tags:
+        - Users
+      summary: 'Deletes an user by `id`'
+      operationId: deleteUser
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        default:
+          $ref: '#/components/responses/UnexpectedError'
+
 components:
+  parameters:
+    id:
+      in: path
+      name: id
+      description: Resource ID
+      required: true
+      schema:
+        type: integer
+        format: uuid
+
   responses:
     ListOfUsers:
       description: List of all users ordered by name
@@ -37,65 +182,151 @@ components:
             type: array
             items:
               $ref: '#/components/schemas/User'
-    Unauthorized:
-      description: Unauthorized Error
+    AuthenticatedUser:
+      description: Authenticated user with token returned after the operation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              _id:
+                type: string
+              username:
+                type: string
+              role:
+                type: string
+              token:
+                type: string
+
+    User:
+      description: User returned after the operation
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+    NoContent:
+      description: The resource was deleted successfully.
+    BadRequest:
+      description: BadRequest
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: 401 - Unauthorized Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthError'
     Forbidden:
-      description: Forbidden Error
+      description: 403 - Forbidden Error
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
     NotFound:
-      description: Not Found Error
+      description: 404 - Not Found Error
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
     UnprocessableEntity:
-      description: Unprocessable Entity Error
+      description: 422 - Unprocessable Entity Error
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ExpressValidatorError'
     InternalServerError:
-      description: Internal Server Error
+      description: 500 - Internal Server Error
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
     UnexpectedError:
-      description: Unexpected error
+      description: 500 - Unexpected error
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+
+  requestBodies:
+    Login:
+      description: Login details body with username and password
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - username
+              - password
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+    UserBodyCreate:
+      description: User request body for Create User
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - username
+              - password
+              - role
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+              role:
+                type: string
+    UserBody:
+      description: User request body
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - username
+              - role
+            properties:
+              username:
+                type: string
+              password:
+                type: string
+              role:
+                type: string
+
   schemas:
     User:
       type: object
       required:
+        - _id
         - username
-        - password
         - role
       properties:
+        _id:
+          type: string
         username:
           type: string
-        password:
-          type: string
         role:
+          type: string
+    AuthError:
+      type: object
+      required:
+        - error
+      properties:
+        error:
           type: string
     Error:
       type: object
       required:
-        - code
+        - status
         - message
       properties:
-        code:
-          type: integer
-          format: int32
+        status:
+          type: string
         message:
           type: string
     ExpressValidatorError:
