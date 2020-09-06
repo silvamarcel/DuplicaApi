@@ -1,5 +1,14 @@
 const _ = require('lodash');
 
+const buildDuplicationErrorMessage = (err, field) => {
+  if (err.message.includes(field)) {
+    _.merge(err, {
+      message: `A factory with this ${field} already exists.`,
+    });
+    throw err;
+  }
+};
+
 const factoryService = ({ store }) => {
   const { Factory } = store.models;
 
@@ -19,8 +28,11 @@ const factoryService = ({ store }) => {
         ]),
       )
       .catch(err => {
-        if (err.code === 11000)
-          _.merge(err, { message: 'A factory with this name already exists.' });
+        if (err.code === 11000) {
+          buildDuplicationErrorMessage(err, 'name');
+          buildDuplicationErrorMessage(err, 'businessId');
+          buildDuplicationErrorMessage(err, 'contract');
+        }
         throw err;
       });
 
