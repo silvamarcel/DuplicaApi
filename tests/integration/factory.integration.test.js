@@ -128,16 +128,52 @@ describe('Factory API', () => {
       });
   });
 
-  it('Should throw an error when try to create the same factory more than once', async done => {
+  it('Should throw A factory with this name already exists when try to create a factory with an existing name', async done => {
     const factory = factorySeed.getNextFactory();
+    const newFactory = factorySeed.getNextFactory();
     await createFactory(factory);
-    await post(app, '/api/factories', factory, loggedUser.token)
+    newFactory.name = factory.name;
+    await post(app, '/api/factories', newFactory, loggedUser.token)
       .expect(403)
       .then(response => {
         expect(response.body).toBeDefined();
         expect(response.body.error).toBeDefined();
         expect(response.body.error.message).toEqual(
           'A factory with this name already exists.',
+        );
+        done();
+      });
+  });
+
+  it('Should throw A factory with this businessId already exists when try to create a factory with an existing businessId', async done => {
+    const factory = factorySeed.getNextFactory();
+    const newFactory = factorySeed.getNextFactory();
+    await createFactory(factory);
+    newFactory.businessId = factory.businessId;
+    await post(app, '/api/factories', newFactory, loggedUser.token)
+      .expect(403)
+      .then(response => {
+        expect(response.body).toBeDefined();
+        expect(response.body.error).toBeDefined();
+        expect(response.body.error.message).toEqual(
+          'A factory with this businessId already exists.',
+        );
+        done();
+      });
+  });
+
+  it('Should throw A factory with this contract already exists when try to create a factory with an existing contract', async done => {
+    const factory = factorySeed.getNextFactory();
+    const newFactory = factorySeed.getNextFactory();
+    await createFactory(factory);
+    newFactory.contract = factory.contract;
+    await post(app, '/api/factories', newFactory, loggedUser.token)
+      .expect(403)
+      .then(response => {
+        expect(response.body).toBeDefined();
+        expect(response.body.error).toBeDefined();
+        expect(response.body.error.message).toEqual(
+          'A factory with this contract already exists.',
         );
         done();
       });
