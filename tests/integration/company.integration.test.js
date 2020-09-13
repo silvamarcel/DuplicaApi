@@ -129,9 +129,11 @@ describe('Company API', () => {
       });
   });
 
-  it('Should throw an error when try to create the same company more than once', async done => {
+  it('Should throw A company with this name already exists when try to create a company with an existing name', async done => {
     const company = companySeed.getNextCompany();
+    const newCompany = companySeed.getNextCompany();
     await createCompany(company);
+    newCompany.name = company.name;
     await post(app, '/api/companies', company, loggedUser.token)
       .expect(403)
       .then(response => {
@@ -139,6 +141,23 @@ describe('Company API', () => {
         expect(response.body.error).toBeDefined();
         expect(response.body.error.message).toEqual(
           'A company with this name already exists.',
+        );
+        done();
+      });
+  });
+
+  it('Should throw A company with this businessId already exists when try to create a company with an existing businessId', async done => {
+    const company = companySeed.getNextCompany();
+    const newCompany = companySeed.getNextCompany();
+    await createCompany(company);
+    newCompany.businessId = company.businessId;
+    await post(app, '/api/companies', newCompany, loggedUser.token)
+      .expect(403)
+      .then(response => {
+        expect(response.body).toBeDefined();
+        expect(response.body.error).toBeDefined();
+        expect(response.body.error.message).toEqual(
+          'A company with this businessId already exists.',
         );
         done();
       });

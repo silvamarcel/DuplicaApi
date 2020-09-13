@@ -1,5 +1,14 @@
 const _ = require('lodash');
 
+const buildDuplicationErrorMessage = (err, field) => {
+  if (err.message.includes(field)) {
+    _.merge(err, {
+      message: `A company with this ${field} already exists.`,
+    });
+    throw err;
+  }
+};
+
 const companyService = ({ store }) => {
   const { Company } = store.models;
 
@@ -20,8 +29,10 @@ const companyService = ({ store }) => {
         ]),
       )
       .catch(err => {
-        if (err.code === 11000)
-          _.merge(err, { message: 'A company with this name already exists.' });
+        if (err.code === 11000) {
+          buildDuplicationErrorMessage(err, 'name');
+          buildDuplicationErrorMessage(err, 'businessId');
+        }
         throw err;
       });
 
