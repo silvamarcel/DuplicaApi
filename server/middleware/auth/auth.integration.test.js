@@ -5,6 +5,9 @@ const {
   request,
   app,
 } = require('../../../tests/integrationTestsSetup');
+const appError = require('../../controllers/appError');
+
+const { OK, BAD_REQUEST, UNAUTHORIZED, NOT_FOUND } = appError.statusCodes;
 
 describe('Authentication API', () => {
   beforeAll(async () => {
@@ -30,7 +33,7 @@ describe('Authentication API', () => {
       .post('/auth/signin')
       .send(user)
       .set('Accept', 'application/json')
-      .expect(200)
+      .expect(OK)
       .then(response => {
         const loggedUser = response.body;
         expect(loggedUser).toBeDefined();
@@ -54,7 +57,7 @@ describe('Authentication API', () => {
       .post('/auth/signin')
       .send(user)
       .set('Accept', 'application/json')
-      .expect(401)
+      .expect(UNAUTHORIZED)
       .then(response => {
         expect(response.body).toBeDefined();
         expect(response.body).toEqual({
@@ -74,7 +77,7 @@ describe('Authentication API', () => {
       .post('/auth/signin')
       .send(user)
       .set('Accept', 'application/json')
-      .expect(400)
+      .expect(BAD_REQUEST)
       .then(response => {
         expect(response.body).toBeDefined();
         expect(response.body).toEqual({
@@ -99,7 +102,7 @@ describe('Authentication API', () => {
       .get('/api/users/me')
       .set('Accept', 'application/json')
       .query({ access_token: createdUser.token })
-      .expect(200)
+      .expect(OK)
       .then(response => {
         const me = response.body;
         expect(me).toBeDefined();
@@ -109,7 +112,7 @@ describe('Authentication API', () => {
       });
   });
 
-  it('Should return Invalid id when try to access with a deleted user', async done => {
+  it('Should return User not found when try to access with a deleted user', async done => {
     const user = {
       username: 'username_auth_005',
       password: 'pass',
@@ -130,11 +133,11 @@ describe('Authentication API', () => {
       .get(`/api/users/${createdUser._id}`)
       .set('Accept', 'application/json')
       .query({ access_token: createdUser.token })
-      .expect(403)
+      .expect(NOT_FOUND)
       .then(response => {
         expect(response.body).toBeDefined();
         expect(response.body.error).toBeDefined();
-        expect(response.body.error.message).toEqual('Invalid id');
+        expect(response.body.error.message).toEqual('User not found');
         done();
       });
   });

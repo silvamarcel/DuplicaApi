@@ -37,19 +37,6 @@ describe('Factory Controller API', () => {
     expect(next).toHaveBeenCalledWith(error);
   });
 
-  it('Should throw Factory not found when factory is not defined', async () => {
-    req = { factory: undefined };
-    res = { json: jest.fn() };
-    next = error => {
-      expect(error).toBeDefined();
-      expect(error.name).toEqual('APIError');
-      expect(error.status).toEqual(404);
-      expect(error.message).toEqual('Factory not found!');
-    };
-    await factoryController.read(req, res, next);
-    expect(res.json).not.toHaveBeenCalled();
-  });
-
   it('Should throw an error when delete gets an error', async () => {
     const error = new Error('Any error!');
     services.factoryService.delete.mockRejectedValue(error);

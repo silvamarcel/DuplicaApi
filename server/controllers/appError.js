@@ -1,5 +1,16 @@
 const APIErrorName = 'APIError';
 
+const statusCodes = {
+  OK: 200,
+  CREATED: 201,
+  NO_CONTENT: 204,
+  BAD_REQUEST: 400,
+  UNAUTHORIZED: 401,
+  FORBIDDEN: 403,
+  NOT_FOUND: 404,
+  UNPROCESSABLE_ENTITY: 422,
+};
+
 const buildError = (err, status, message) => {
   let error = err;
   if (!error) {
@@ -17,4 +28,5 @@ const buildError = (err, status, message) => {
 
 module.exports = {
   buildError,
+  statusCodes,
 };
