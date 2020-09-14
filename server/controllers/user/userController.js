@@ -3,6 +3,7 @@ const _ = require('lodash');
 const userController = ({ middleware, services, appError }) => {
   const { auth } = middleware;
   const { userService } = services;
+  const { OK, CREATED, NO_CONTENT, NOT_FOUND } = appError.statusCodes;
 
   const buildSavedUser = savedUser => {
     const user = _.pick(savedUser, ['_id', 'username', 'role']);
@@ -15,7 +16,7 @@ const userController = ({ middleware, services, appError }) => {
       .read(id)
       .then(user => {
         if (!user) {
-          return next(appError.buildError(null, 403, 'Invalid id'));
+          return next(appError.buildError(null, NOT_FOUND, 'User not found'));
         }
         req.userModel = user;
         req.leanUser = user.toObject();
@@ -31,7 +32,10 @@ const userController = ({ middleware, services, appError }) => {
   const list = (req, res, next) =>
     userService
       .list()
-      .then(users => res.json(users))
+      .then(users => {
+        res.status(OK);
+        res.json(users);
+      })
       .catch(err => next(err));
 
   const create = async (req, res, next) => {
@@ -39,15 +43,13 @@ const userController = ({ middleware, services, appError }) => {
     await userService
       .create(req.body)
       .then(savedUser => {
+        res.status(CREATED);
         res.json(buildSavedUser(savedUser));
       })
       .catch(err => next(err));
   };
 
-  const read = (req, res, next) => {
-    if (!req.leanUser) {
-      return next(appError.buildError(null, 404, 'User not found!'));
-    }
+  const read = (req, res) => {
     return res.json(req.leanUser);
   };
 
@@ -57,6 +59,7 @@ const userController = ({ middleware, services, appError }) => {
     await userService
       .update(userModel, req.body)
       .then(savedUser => {
+        res.status(OK);
         res.json(buildSavedUser(savedUser));
       })
       .catch(err => next(err));
@@ -65,7 +68,10 @@ const userController = ({ middleware, services, appError }) => {
   const deleteUser = async (req, res, next) => {
     await userService
       .delete(req.userModel)
-      .then(removedUser => res.json(removedUser))
+      .then(() => {
+        res.status(NO_CONTENT);
+        res.send();
+      })
       .catch(err => next(err));
   };
 

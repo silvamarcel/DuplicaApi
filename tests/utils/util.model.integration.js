@@ -1,6 +1,8 @@
 const config = require('../../server/config/config');
+const appError = require('../../server/controllers/appError');
 
 const { userManager, passManager } = config;
+const { CREATED } = appError.statusCodes;
 
 const apiPaths = {
   login: '/auth/signin',
@@ -34,6 +36,7 @@ const create = async (request, newModel, apiPath, token) => {
     .post(apiPath)
     .set('Authorization', `Bearer ${bearerToken}`)
     .send(newModel)
+    .expect(CREATED)
     .then(response => response.body);
 };
 

@@ -5,6 +5,7 @@ module.exports = {
     './node_modules/lodash',
     './node_modules/mongoose',
   ],
+  testPathIgnorePatterns: ['tests/utils'],
   coverageDirectory: 'coverage',
   coverageThreshold: {
     global: {

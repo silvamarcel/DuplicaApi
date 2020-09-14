@@ -1,8 +1,23 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
-const { setup, modelUtil, request, app } = require('../integrationTestsSetup');
+const {
+  setup,
+  modelUtil,
+  request,
+  app,
+  testUtil,
+} = require('../integrationTestsSetup');
+const appError = require('../../server/controllers/appError');
 
 const { companySeed, userSeed } = setup.seeds;
+const { validateError, validateRequiredErrors } = testUtil;
 const { get, put, remove, post } = setup.request;
+const {
+  OK,
+  NO_CONTENT,
+  FORBIDDEN,
+  NOT_FOUND,
+  UNPROCESSABLE_ENTITY,
+} = appError.statusCodes;
 
 let loggedUser = null;
 
@@ -12,8 +27,8 @@ const createCompany = company =>
 const user = userSeed.getNextUser();
 
 const validateCompany = (expectedCompany, company) => {
-  expect(expectedCompany.businessId).toEqual(company.businessId);
   expect(expectedCompany.name).toEqual(company.name);
+  expect(expectedCompany.businessId).toEqual(company.businessId);
   expect(expectedCompany.bankInformation).toEqual(company.bankInformation);
   expect(expectedCompany.taxInformation).toEqual(company.taxInformation);
 };
@@ -25,24 +40,24 @@ const validateCompanyWithIdIncluded = (createdCompany, done) => response => {
   done();
 };
 
-const validateCompanyField = field => response => {
-  expect(response.body).toBeDefined();
-  expect(response.body.errors).toBeDefined();
-  expect(response.body.errors).toHaveLength(1);
-  expect(response.body.errors[0].location).toEqual('body');
-  expect(response.body.errors[0].param).toEqual(field);
-  expect(response.body.errors[0].value).toEqual('');
-};
-
-const validateCompanyMissingField = (field, done) => response => {
-  validateCompanyField(field);
-  expect(response.body.errors[0].msg).toEqual(`Company ${field} is required`);
+const validateCompanyMissingField = (field, done, param) => response => {
+  const deepField = param || field;
+  validateRequiredErrors(
+    response,
+    'body',
+    deepField,
+    '',
+    `Company ${field} is required`,
+  );
   done();
 };
 
 const validateCompanyInvalidZipCode = done => response => {
-  validateCompanyField('address.zipCode');
-  expect(response.body.errors[0].msg).toEqual(
+  validateRequiredErrors(
+    response,
+    'body',
+    'address.zipCode',
+    'invalidZipCode',
     'Company zipCode can only contains numbers',
   );
   done();
@@ -68,7 +83,7 @@ describe('Company API', () => {
     const createdCompany1 = await createCompany(company1);
     const createdCompany2 = await createCompany(company2);
     await get(app, '/api/companies', loggedUser.token)
-      .expect(200)
+      .expect(OK)
       .then(response => {
         const companies = response.body;
         expect(companies.length).toBeGreaterThanOrEqual(2);
@@ -88,7 +103,7 @@ describe('Company API', () => {
     const company = companySeed.getNextCompany();
     const createdCompany = await createCompany(company);
     await get(app, `/api/companies/${createdCompany._id}`, loggedUser.token)
-      .expect(200)
+      .expect(OK)
       .then(validateCompanyWithIdIncluded(createdCompany, done));
   });
 
@@ -102,7 +117,7 @@ describe('Company API', () => {
       company,
       loggedUser.token,
     )
-      .expect(200)
+      .expect(OK)
       .then(
         validateCompanyWithIdIncluded(
           { ...createdCompany, name: company.name },
@@ -118,13 +133,11 @@ describe('Company API', () => {
       app,
       `/api/companies/${createdCompany._id}`,
       loggedUser.token,
-    ).expect(200);
+    ).expect(NO_CONTENT);
     await get(app, `/api/companies/${createdCompany._id}`, loggedUser.token)
-      .expect(403)
+      .expect(NOT_FOUND)
       .then(response => {
-        expect(response.body).toBeDefined();
-        expect(response.body.error).toBeDefined();
-        expect(response.body.error.message).toEqual('Invalid id');
+        validateError(response, 'Company not found');
         done();
       });
   });
@@ -135,13 +148,9 @@ describe('Company API', () => {
     await createCompany(company);
     newCompany.name = company.name;
     await post(app, '/api/companies', company, loggedUser.token)
-      .expect(403)
+      .expect(FORBIDDEN)
       .then(response => {
-        expect(response.body).toBeDefined();
-        expect(response.body.error).toBeDefined();
-        expect(response.body.error.message).toEqual(
-          'A company with this name already exists.',
-        );
+        validateError(response, 'A company with this name already exists.');
         done();
       });
   });
@@ -152,11 +161,10 @@ describe('Company API', () => {
     await createCompany(company);
     newCompany.businessId = company.businessId;
     await post(app, '/api/companies', newCompany, loggedUser.token)
-      .expect(403)
+      .expect(FORBIDDEN)
       .then(response => {
-        expect(response.body).toBeDefined();
-        expect(response.body.error).toBeDefined();
-        expect(response.body.error.message).toEqual(
+        validateError(
+          response,
           'A company with this businessId already exists.',
         );
         done();
@@ -171,7 +179,7 @@ describe('Company API', () => {
       { ...company, businessId: '' },
       loggedUser.token,
     )
-      .expect(422)
+      .expect(UNPROCESSABLE_ENTITY)
       .then(validateCompanyMissingField('businessId', done));
   });
 
@@ -183,32 +191,44 @@ describe('Company API', () => {
       { ...company, name: '' },
       loggedUser.token,
     )
-      .expect(422)
+      .expect(UNPROCESSABLE_ENTITY)
       .then(validateCompanyMissingField('name', done));
   });
 
   it('Should throw branch is required error when try to create a company without bankInformation', async done => {
     const company = companySeed.getNextCompany();
+    const { bankInformation } = company;
+    bankInformation.branch = '';
     await post(
       app,
       '/api/companies',
-      { ...company, bankInformation: null },
+      { ...company, bankInformation },
       loggedUser.token,
     )
-      .expect(422)
-      .then(validateCompanyMissingField('branch', done));
+      .expect(UNPROCESSABLE_ENTITY)
+      .then(
+        validateCompanyMissingField('branch', done, 'bankInformation.branch'),
+      );
   });
 
   it('Should throw accumulated pis is required error when try to create a company without taxInformation', async done => {
     const company = companySeed.getNextCompany();
+    const { taxInformation } = company;
+    taxInformation.accumulated.pis = '';
     await post(
       app,
       '/api/companies',
-      { ...company, taxInformation: null },
+      { ...company, taxInformation },
       loggedUser.token,
     )
-      .expect(422)
-      .then(validateCompanyMissingField('accumulated pis', done));
+      .expect(UNPROCESSABLE_ENTITY)
+      .then(
+        validateCompanyMissingField(
+          'accumulated pis',
+          done,
+          'taxInformation.accumulated.pis',
+        ),
+      );
   });
 
   it('Should throw businessId is required error when try to update a company without businessId', async done => {
@@ -220,7 +240,7 @@ describe('Company API', () => {
       { ...company, businessId: '' },
       loggedUser.token,
     )
-      .expect(422)
+      .expect(UNPROCESSABLE_ENTITY)
       .then(validateCompanyMissingField('businessId', done));
   });
 
@@ -233,34 +253,46 @@ describe('Company API', () => {
       { ...company, name: '' },
       loggedUser.token,
     )
-      .expect(422)
+      .expect(UNPROCESSABLE_ENTITY)
       .then(validateCompanyMissingField('name', done));
   });
 
   it('Should throw branch is required error when try to update a company without bankInformation', async done => {
     const company = companySeed.getNextCompany();
     const createdCompany = await createCompany(company);
+    const { bankInformation } = company;
+    bankInformation.branch = '';
     await put(
       app,
       `/api/companies/${createdCompany._id}`,
-      { ...company, bankInformation: null },
+      { ...company, bankInformation },
       loggedUser.token,
     )
-      .expect(422)
-      .then(validateCompanyMissingField('branch', done));
+      .expect(UNPROCESSABLE_ENTITY)
+      .then(
+        validateCompanyMissingField('branch', done, 'bankInformation.branch'),
+      );
   });
 
   it('Should throw accumulated pis is required error when try to update a company without taxInformation', async done => {
     const company = companySeed.getNextCompany();
     const createdCompany = await createCompany(company);
+    const { taxInformation } = company;
+    taxInformation.accumulated.pis = '';
     await put(
       app,
       `/api/companies/${createdCompany._id}`,
-      { ...company, taxInformation: null },
+      { ...company, taxInformation },
       loggedUser.token,
     )
-      .expect(422)
-      .then(validateCompanyMissingField('accumulated pis', done));
+      .expect(UNPROCESSABLE_ENTITY)
+      .then(
+        validateCompanyMissingField(
+          'accumulated pis',
+          done,
+          'taxInformation.accumulated.pis',
+        ),
+      );
   });
 
   it('Should throw zipCode can only contains numbers when try to update a company with an invalid zipCode', async done => {
@@ -276,19 +308,16 @@ describe('Company API', () => {
       { ...company, address },
       loggedUser.token,
     )
-      .expect(422)
+      .expect(UNPROCESSABLE_ENTITY)
       .then(validateCompanyInvalidZipCode(done));
   });
 
   it('Should throw APIError with status 403 and Invalid id when a CastError occurs', async done => {
     const invalidId = 'myId';
     await get(app, `/api/companies/${invalidId}`, loggedUser.token)
-      .expect(403)
+      .expect(FORBIDDEN)
       .then(response => {
-        const { error } = response.body;
-        expect(error).toBeDefined();
-        expect(error.status).toEqual(403);
-        expect(error.message).toEqual('Invalid id');
+        validateError(response, 'Invalid id');
         done();
       });
   });

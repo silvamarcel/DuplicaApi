@@ -37,19 +37,6 @@ describe('User Controller API', () => {
     expect(next).toHaveBeenCalledWith(error);
   });
 
-  it('Should throw User not found when user is not defined', async () => {
-    req = { userLean: undefined };
-    res = { json: jest.fn() };
-    next = error => {
-      expect(error).toBeDefined();
-      expect(error.name).toEqual('APIError');
-      expect(error.status).toEqual(404);
-      expect(error.message).toEqual('User not found!');
-    };
-    await userController.read(req, res, next);
-    expect(res.json).not.toHaveBeenCalled();
-  });
-
   it('Should throw an error when delete gets an error', async () => {
     const error = new Error('Any error!');
     services.userService.delete.mockRejectedValue(error);

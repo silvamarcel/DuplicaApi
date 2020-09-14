@@ -1,12 +1,15 @@
 const factoryController = ({ middleware, services, appError }) => {
   const { factoryService } = services;
+  const { OK, CREATED, NO_CONTENT, NOT_FOUND } = appError.statusCodes;
 
   const params = async (req, res, next, id) => {
     await factoryService
       .read(id)
       .then(factory => {
         if (!factory) {
-          return next(appError.buildError(null, 403, 'Invalid id'));
+          return next(
+            appError.buildError(null, NOT_FOUND, 'Factory not found'),
+          );
         }
         req.factory = factory;
         return next();
@@ -14,25 +17,27 @@ const factoryController = ({ middleware, services, appError }) => {
       .catch(err => next(err));
   };
 
-  // TODO Improve ability to filter by name
   const list = (req, res, next) =>
     factoryService
       .list()
-      .then(factories => res.json(factories))
+      .then(factories => {
+        res.status(OK);
+        res.json(factories);
+      })
       .catch(err => next(err));
 
   const create = async (req, res, next) => {
     await middleware.appValidation.validateRequest(req, res);
     await factoryService
       .create(req.body)
-      .then(factory => res.json(factory))
+      .then(factory => {
+        res.status(CREATED);
+        res.json(factory);
+      })
       .catch(err => next(err));
   };
 
-  const read = (req, res, next) => {
-    if (!req.factory) {
-      return next(appError.buildError(null, 404, 'Factory not found!'));
-    }
+  const read = (req, res) => {
     return res.json(req.factory);
   };
 
@@ -41,14 +46,20 @@ const factoryController = ({ middleware, services, appError }) => {
     const { factory } = req;
     await factoryService
       .update(factory, req.body)
-      .then(updatedFactory => res.json(updatedFactory))
+      .then(updatedFactory => {
+        res.status(OK);
+        res.json(updatedFactory);
+      })
       .catch(err => next(err));
   };
 
   const deleteFactory = async (req, res, next) => {
     await factoryService
       .delete(req.factory)
-      .then(deletedFactory => res.json(deletedFactory))
+      .then(() => {
+        res.status(NO_CONTENT);
+        res.send();
+      })
       .catch(err => next(err));
   };
 

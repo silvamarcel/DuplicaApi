@@ -1,8 +1,23 @@
 /* eslint no-underscore-dangle: ["error", { "allow": ["_id"] }] */
-const { setup, modelUtil, request, app } = require('../integrationTestsSetup');
+const {
+  setup,
+  modelUtil,
+  request,
+  app,
+  testUtil,
+} = require('../integrationTestsSetup');
+const appError = require('../../server/controllers/appError');
 
 const { factorySeed, userSeed } = setup.seeds;
+const { validateError, validateRequiredErrors } = testUtil;
 const { get, put, remove, post } = setup.request;
+const {
+  OK,
+  NO_CONTENT,
+  FORBIDDEN,
+  NOT_FOUND,
+  UNPROCESSABLE_ENTITY,
+} = appError.statusCodes;
 
 let loggedUser = null;
 
@@ -24,24 +39,23 @@ const validateFactoryWithIdIncluded = (createdFactory, done) => response => {
   done();
 };
 
-const validateFactoryField = field => response => {
-  expect(response.body).toBeDefined();
-  expect(response.body.errors).toBeDefined();
-  expect(response.body.errors).toHaveLength(1);
-  expect(response.body.errors[0].location).toEqual('body');
-  expect(response.body.errors[0].param).toEqual(field);
-  expect(response.body.errors[0].value).toEqual('');
-};
-
 const validateFactoryMissingField = (field, done) => response => {
-  validateFactoryField(field);
-  expect(response.body.errors[0].msg).toEqual(`Factory ${field} is required`);
+  validateRequiredErrors(
+    response,
+    'body',
+    field,
+    '',
+    `Factory ${field} is required`,
+  );
   done();
 };
 
 const validateFactoryInvalidZipCode = done => response => {
-  validateFactoryField('address.zipCode');
-  expect(response.body.errors[0].msg).toEqual(
+  validateRequiredErrors(
+    response,
+    'body',
+    'address.zipCode',
+    'invalidZipCode',
     'Factory zipCode can only contains numbers',
   );
   done();
@@ -67,7 +81,7 @@ describe('Factory API', () => {
     const createdFactory1 = await createFactory(factory1);
     const createdFactory2 = await createFactory(factory2);
     await get(app, '/api/factories', loggedUser.token)
-      .expect(200)
+      .expect(OK)
       .then(response => {
         const factories = response.body;
         expect(factories.length).toBeGreaterThanOrEqual(2);
@@ -87,7 +101,7 @@ describe('Factory API', () => {
     const factory = factorySeed.getNextFactory();
     const createdFactory = await createFactory(factory);
     await get(app, `/api/factories/${createdFactory._id}`, loggedUser.token)
-      .expect(200)
+      .expect(OK)
       .then(validateFactoryWithIdIncluded(createdFactory, done));
   });
 
@@ -101,7 +115,7 @@ describe('Factory API', () => {
       factory,
       loggedUser.token,
     )
-      .expect(200)
+      .expect(OK)
       .then(
         validateFactoryWithIdIncluded(
           { ...createdFactory, name: factory.name },
@@ -117,13 +131,11 @@ describe('Factory API', () => {
       app,
       `/api/factories/${createdFactory._id}`,
       loggedUser.token,
-    ).expect(200);
+    ).expect(NO_CONTENT);
     await get(app, `/api/factories/${createdFactory._id}`, loggedUser.token)
-      .expect(403)
+      .expect(NOT_FOUND)
       .then(response => {
-        expect(response.body).toBeDefined();
-        expect(response.body.error).toBeDefined();
-        expect(response.body.error.message).toEqual('Invalid id');
+        validateError(response, 'Factory not found');
         done();
       });
   });
@@ -134,13 +146,9 @@ describe('Factory API', () => {
     await createFactory(factory);
     newFactory.name = factory.name;
     await post(app, '/api/factories', newFactory, loggedUser.token)
-      .expect(403)
+      .expect(FORBIDDEN)
       .then(response => {
-        expect(response.body).toBeDefined();
-        expect(response.body.error).toBeDefined();
-        expect(response.body.error.message).toEqual(
-          'A factory with this name already exists.',
-        );
+        validateError(response, 'A factory with this name already exists.');
         done();
       });
   });
@@ -151,11 +159,10 @@ describe('Factory API', () => {
     await createFactory(factory);
     newFactory.businessId = factory.businessId;
     await post(app, '/api/factories', newFactory, loggedUser.token)
-      .expect(403)
+      .expect(FORBIDDEN)
       .then(response => {
-        expect(response.body).toBeDefined();
-        expect(response.body.error).toBeDefined();
-        expect(response.body.error.message).toEqual(
+        validateError(
+          response,
           'A factory with this businessId already exists.',
         );
         done();
@@ -168,13 +175,9 @@ describe('Factory API', () => {
     await createFactory(factory);
     newFactory.contract = factory.contract;
     await post(app, '/api/factories', newFactory, loggedUser.token)
-      .expect(403)
+      .expect(FORBIDDEN)
       .then(response => {
-        expect(response.body).toBeDefined();
-        expect(response.body.error).toBeDefined();
-        expect(response.body.error.message).toEqual(
-          'A factory with this contract already exists.',
-        );
+        validateError(response, 'A factory with this contract already exists.');
         done();
       });
   });
@@ -187,7 +190,7 @@ describe('Factory API', () => {
       { ...factory, businessId: '' },
       loggedUser.token,
     )
-      .expect(422)
+      .expect(UNPROCESSABLE_ENTITY)
       .then(validateFactoryMissingField('businessId', done));
   });
 
@@ -199,7 +202,7 @@ describe('Factory API', () => {
       { ...factory, name: '' },
       loggedUser.token,
     )
-      .expect(422)
+      .expect(UNPROCESSABLE_ENTITY)
       .then(validateFactoryMissingField('name', done));
   });
 
@@ -211,7 +214,7 @@ describe('Factory API', () => {
       { ...factory, contract: '' },
       loggedUser.token,
     )
-      .expect(422)
+      .expect(UNPROCESSABLE_ENTITY)
       .then(validateFactoryMissingField('contract', done));
   });
 
@@ -224,7 +227,7 @@ describe('Factory API', () => {
       { ...factory, businessId: '' },
       loggedUser.token,
     )
-      .expect(422)
+      .expect(UNPROCESSABLE_ENTITY)
       .then(validateFactoryMissingField('businessId', done));
   });
 
@@ -237,7 +240,7 @@ describe('Factory API', () => {
       { ...factory, name: '' },
       loggedUser.token,
     )
-      .expect(422)
+      .expect(UNPROCESSABLE_ENTITY)
       .then(validateFactoryMissingField('name', done));
   });
 
@@ -250,7 +253,7 @@ describe('Factory API', () => {
       { ...factory, contract: '' },
       loggedUser.token,
     )
-      .expect(422)
+      .expect(UNPROCESSABLE_ENTITY)
       .then(validateFactoryMissingField('contract', done));
   });
 
@@ -267,19 +270,16 @@ describe('Factory API', () => {
       { ...factory, address },
       loggedUser.token,
     )
-      .expect(422)
+      .expect(UNPROCESSABLE_ENTITY)
       .then(validateFactoryInvalidZipCode(done));
   });
 
   it('Should throw APIError with status 403 and Invalid id when a CastError occurs', async done => {
     const invalidId = 'myId';
     await get(app, `/api/factories/${invalidId}`, loggedUser.token)
-      .expect(403)
+      .expect(FORBIDDEN)
       .then(response => {
-        const { error } = response.body;
-        expect(error).toBeDefined();
-        expect(error.status).toEqual(403);
-        expect(error.message).toEqual('Invalid id');
+        validateError(response, 'Invalid id');
         done();
       });
   });

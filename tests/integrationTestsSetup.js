@@ -8,10 +8,12 @@ const errors = require('../server/errors')({ logger });
 const middleware = require('../server/middleware')({ store, config, errors });
 const app = require('../server/server')({ middleware, store });
 const modelUtil = require('./utils/util.model.integration');
+const testUtil = require('./utils/util.test');
 
 module.exports = {
   setup,
   modelUtil,
+  testUtil,
   request,
   app,
 };
